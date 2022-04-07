@@ -54,17 +54,46 @@ class TT(Enum):
     JUMP = "JUMP"
     INT = "INT"
     RTI = "RETI"
-    ACC = "ACC"
-    IN1 = "IN1"
-    IN2 = "IN2"
-    PC = "PC"
-    SP = "SP"
-    BAF = "BAF"
-    CS = "CS"
-    DS = "DS"
+    CALL = "CALL"
+    REG = "register"
     IMMEDIATE = "immediate"
-    MINUS = "-"
     SEMICOLON = ";"
+    EOF = "end of file"
+
+
+NOT_TO_MAP = ("immediate", "register")
+REGISTERS = ("ACC", "IN1", "IN2", "SP", "BAF", "CS", "DS")
+
+STRING_TO_TT_SIMPLE = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_") and len(value.value) < 2
+    )
+}
+
+REGISTER = [
+    "ACC",
+    "IN1",
+    "IN2",
+    "PC",
+    "SP",
+    "BAF",
+    "CS",
+    "DS",
+]
+
+STRING_TO_TT_INSTRUCTION = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_")
+        and value.value[0] not in REGISTERS + NOT_TO_MAP
+        and len(value.value) >= 2
+    )
+}
 
 
 class Lexer:
@@ -81,28 +110,6 @@ class Lexer:
     DIGIT_WITHOUT_ZERO = "123456789"
     DIGIT_WITH_ZERO = "0123456789"
     LETTER = string.ascii_letters
-
-    NOT_TO_MAP = ("immediate", )
-    REGISTERS = ("ACC", "IN1", "IN2", "SP", "BAF", "CS", "DS")
-
-    STRING_TO_TT_REGISTER = {
-        value.value: value
-        for value in (
-            value
-            for key, value in TT.__dict__.items()
-            if not key.startswith("_")
-            and value.value[0] in REGISTERS
-    }
-
-    STRING_TO_TT_INSTRUCTIONS = {
-        value.value: value
-        for value in (
-            value
-            for key, value in TT.__dict__.items()
-            if not key.startswith("_")
-            and value.value[0] not in REGISTERS + NOT_TO_MAP
-        )
-    }
 
     def __init__(self, finput):
         """
@@ -126,30 +133,41 @@ class Lexer:
             self.position = (self.lc_row, self.lc_col)
             if self.lc in " \t":
                 self.next_char()
+            elif STRING_TO_TT_SIMPLE.get(self.lc):
+                # simple symbols
+                # :grammar: ,|;|-
+                self.next_char()
+                return Token(STRING_TO_TT_SIMPLE[self.c], self.c, self.position)
             elif self.lc in self.LETTER:
-                # identifier or special keyword symbol
-                # :grammar: <identifier>|if|else|while|do|int|char
-                # |void|const|main
-                # :identifier: <letter> <letter_digit>*
+                # word, i.e. instruction or register
+                # :grammar:
                 self.next_char()
                 symbol = self.c
                 while self.lc in self.LETTER:
                     self.next_char()
                     symbol += self.c
-                if self.STRING_TO_TT_REGISTER.get(symbol):
+                if symbol in REGISTER:
+                    return Token(TT.REG, symbol, self.position)
+                elif STRING_TO_TT_INSTRUCTION.get(symbol):
                     return Token(
-                        self.STRING_TO_TT_REGISTER[symbol], symbol, self.position
+                        STRING_TO_TT_INSTRUCTION[symbol], symbol, self.position
                     )
-                return Token(TT.IDENTIFIER, symbol, self.position)
-            elif self.lc in self.DIGIT_WITH_ZERO:
+                else:
+                    raise Errors.InvalidWordError(symbol, self.position)
+            elif self.lc in self.DIGIT_WITH_ZERO + "-":
                 # number
-                # :grammar: 0|(<digit_without_zero><digit_with_zero>*)
-                if self.lc == 0:
+                # :grammar:
+                if self.lc == "0":
                     self.next_char()
                     return Token(TT.IMMEDIATE, self.c, self.position)
-                # else: self.lc in self.DIGIT_WITHOUT_ZERO:
-                self.next_char()
-                symbol = self.c
+                elif self.lc == "-":
+                    self.next_char()
+                    symbol = self.c
+                    if self.lc not in self.DIGIT_WITHOUT_ZERO:
+                        raise Errors.InvalidNumberError("digit", self.lc, self.position)
+                else:
+                    self.next_char()
+                    symbol = self.c
                 while self.lc in self.DIGIT_WITH_ZERO:
                     self.next_char()
                     symbol += self.c
