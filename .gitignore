@@ -1,0 +1,11 @@
+__pycache__/
+dist/
+dist_old/
+dist_old_2/
+dist_old_3/
+build/
+output.reti
+output.csv
+input.csv
+pico_c_compiler.spec
+README.txt
