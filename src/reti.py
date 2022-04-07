@@ -15,10 +15,17 @@ class RETI:
             "CS": 0,
             "DS": 0,
         }
-        self.memory = {i: 0 for i in range(global_vars.args.end_data_segment)}
+        self.eprom = {i: 0 for i in range(global_vars.args.eprom_size)}
+        self.uart = {i: 0 for i in range(global_vars.args.uart_size)}
+        self.sram = {
+            i: 0
+            for i in range(
+                max(global_vars.args.sram_size, global_vars.args.end_data_segment)
+            )
+        }
 
     def __repr__(self):
-        return f"{self.registers}\n{self.memory}"
+        return f"Registers:\n\t{self.registers}\nEPROM:\n\t{self.eprom}\nUART:\n\t{self.uart}\nSRAM:\n\t{self.sram}"
 
 
 #  def RETI():

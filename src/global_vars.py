@@ -5,16 +5,23 @@ class Args:
         self.tokens = True
         self.abstract_syntax = True
         self.print = True
-        self.begin_data_segment = 10
-        self.end_data_segment = 20
+        self.begin_data_segment = 8
+        self.end_data_segment = 32
         self.distance = 20
         self.verbose = True
         self.sight = 2
         self.color = True
+        self.eprom_size = 16
+        self.uart_size = 4
+        self.sram_size = 32
 
 
 # options from command-line arguments
 args = Args("")
+
+# for turning the "writing the nodetype in front of the parenthesis" for
+# __repr__ temporarily on and off
+show_node = True
 
 # constants to determine whether a number is in the right range for a certain
 # dataype etc.

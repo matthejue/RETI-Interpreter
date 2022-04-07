@@ -57,19 +57,27 @@ class TT(Enum):
     CALL = "CALL"
     REG = "register"
     IMMEDIATE = "immediate"
+    LT = "<"
+    LTE = "<="
+    GT = ">"
+    GTE = ">="
+    EQ = "="
+    EQ2 = "=="
+    NEQ = "!="
+    NEQ2 = "<>"
     SEMICOLON = ";"
     EOF = "end of file"
 
 
 NOT_TO_MAP = ("immediate", "register")
-REGISTERS = ("ACC", "IN1", "IN2", "SP", "BAF", "CS", "DS")
+RELATIONS = ("<", "<=", ">", ">=", "=", "==", "!=", "<>")
 
-STRING_TO_TT_SIMPLE = {
+STRING_TO_TT_RELATION = {
     value.value: value
     for value in (
         value
         for key, value in TT.__dict__.items()
-        if not key.startswith("_") and len(value.value) < 2
+        if not key.startswith("_") and value.value in RELATIONS
     )
 }
 
@@ -90,7 +98,7 @@ STRING_TO_TT_INSTRUCTION = {
         value
         for key, value in TT.__dict__.items()
         if not key.startswith("_")
-        and value.value[0] not in REGISTERS + NOT_TO_MAP
+        and value.value not in NOT_TO_MAP
         and len(value.value) >= 2
     )
 }
@@ -133,11 +141,22 @@ class Lexer:
             self.position = (self.lc_row, self.lc_col)
             if self.lc in " \t":
                 self.next_char()
-            elif STRING_TO_TT_SIMPLE.get(self.lc):
-                # simple symbols
-                # :grammar: ,|;|-
+            elif self.lc == ";":
+                # :grammar: ;
                 self.next_char()
-                return Token(STRING_TO_TT_SIMPLE[self.c], self.c, self.position)
+                return Token(TT.SEMICOLON, self.c, self.position)
+            elif self.lc in "<>=!":
+                # :grammar: <|<=|>|>=|=|==|!=|<>
+                self.next_char()
+                if STRING_TO_TT_RELATION.get(self.c + self.lc):
+                    symbol = self.c + self.lc
+                    self.next_char()
+                    return Token(
+                        STRING_TO_TT_RELATION[symbol],
+                        symbol,
+                        self.position,
+                    )
+                return Token(STRING_TO_TT_RELATION[self.c], self.c, self.position)
             elif self.lc in self.LETTER:
                 # word, i.e. instruction or register
                 # :grammar:

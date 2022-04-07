@@ -23,12 +23,15 @@ class Interpreter(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=10)
-    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=20)
+    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=8)
+    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=32)
     cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
-    cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
+    cli_args_parser.add_argument("-s", "--sight", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
+    cli_args_parser.add_argument("-E", "--eprom_size", type=int, default=16)
+    cli_args_parser.add_argument("-U", "--uart_size", type=int, default=4)
+    cli_args_parser.add_argument("-S", "--sram_size", type=int, default=32)
 
     #  cli_args_parser.add_argument(
     #      '-O',

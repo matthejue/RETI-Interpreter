@@ -29,19 +29,38 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
         TT.ANDI: NT.Andi,
     }
 
-    OTHER_INSTRUCTION = [
+    RELATION = {
+        TT.LT: NT.LT,
+        TT.LTE: NT.LTE,
+        TT.GT: NT.GT,
+        TT.GTE: NT.GTE,
+        TT.EQ: NT.EQ,
+        TT.EQ2: NT.EQ2,
+        TT.NEQ: NT.NEQ,
+        TT.NEQ2: NT.NEQ2,
+    }
+
+    OTHER_INSTRUCTION = {
         TT.LOAD,
         TT.LOADIN,
         TT.LOADI,
         TT.STORE,
         TT.STOREIN,
         TT.MOVE,
-    ]
+        TT.JUMP,
+        TT.INT,
+        TT.RTI,
+    }
 
     def code_instr(self):
         savestate_node = self.ast_builder.down(NT.Program)
 
-        self._instr()
+        while self.LTT(1) in chain(
+            self.COMPUTE_INSTRUCTION.keys(),
+            self.COMPUTE_IMMEDIATE_INSTRUCTION.keys(),
+            self.OTHER_INSTRUCTION,
+        ):
+            self._instr()
 
         self.ast_builder.up(savestate_node)
 
@@ -51,45 +70,143 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
         :concrete:
         :abstract: abstract grammar specification
         """
-        while self.LTT(1) in chain(
-            self.COMPUTE_INSTRUCTION.keys(),
-            self.COMPUTE_IMMEDIATE_INSTRUCTION.keys(),
-            self.OTHER_INSTRUCTION,
-        ):
-            if self.LTT(1) in self.COMPUTE_INSTRUCTION.keys():
-                # concrete_syntax: <COMPUTE_INSTRUCTION> <REGISTER> (<REGISTER>|<Immediate>)
-                savestate_node = self.ast_builder.down(NT.Instr)
+        if self.LTT(1) in self.COMPUTE_INSTRUCTION.keys():
+            # concrete_syntax: <COMPUTE_INSTRUCTION> <REGISTER> (<REGISTER>|<Immediate>)
+            savestate_node = self.ast_builder.down(NT.Instr)
 
-                self.add_and_consume(mapping=self.COMPUTE_INSTRUCTION)
+            self.add_and_consume(mapping=self.COMPUTE_INSTRUCTION)
 
-                self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=NT.Reg)
 
-                if self.LTT(1) == TT.REG:
-                    self.add_and_consume(classname=NT.Reg)
-                elif self.LTT(1) == TT.IMMEDIATE:
-                    self.add_and_consume(classname=NT.Immediate)
+            if self.LTT(1) == TT.REG:
+                self.add_and_consume(classname=NT.Reg)
+            elif self.LTT(1) == TT.IMMEDIATE:
+                self.add_and_consume(classname=NT.Immediate)
 
-                if self.LTT(1) == TT.SEMICOLON:
-                    self.consume_next_token()
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
 
-                self.ast_builder.up(savestate_node)
-            elif self.LTT(1) in self.COMPUTE_IMMEDIATE_INSTRUCTION.keys():
-                # concrete_syntax: <COMPUTE_IMMEDIATE_INSTRUCTION> <REGISTER> <Immediate>
-                savestate_node = self.ast_builder.down(NT.Instr)
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) in self.COMPUTE_IMMEDIATE_INSTRUCTION.keys():
+            # concrete_syntax: <COMPUTE_IMMEDIATE_INSTRUCTION> <REGISTER> <Immediate>
+            savestate_node = self.ast_builder.down(NT.Instr)
 
-                self.add_and_consume(mapping=self.COMPUTE_IMMEDIATE_INSTRUCTION)
+            self.add_and_consume(mapping=self.COMPUTE_IMMEDIATE_INSTRUCTION)
 
-                self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=NT.Reg)
 
-                self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-                if self.LTT(1) == TT.SEMICOLON:
-                    self.consume_next_token()
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
 
-                self.ast_builder.up(savestate_node)
-            elif self.LTT(1) == TT.JUMP:
-                savestate_node = self.ast_builder.down(NT.Jump)
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.LOAD:
+            savestate_node = self.ast_builder.down(NT.Instr)
 
-                self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_consume(classname=NT.Load)
 
-                self.ast_builder.up(savestate_node)
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.LOADIN:
+            savestate_node = self.ast_builder.down(NT.Instr)
+
+            self.add_and_consume(classname=NT.Loadin)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.LOADI:
+            savestate_node = self.ast_builder.down(NT.Instr)
+
+            self.add_and_consume(classname=NT.Loadi)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.STORE:
+            savestate_node = self.ast_builder.down(NT.Instr)
+
+            self.add_and_consume(classname=NT.Store)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.STOREIN:
+            savestate_node = self.ast_builder.down(NT.Instr)
+
+            self.add_and_consume(classname=NT.Storein)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.MOVE:
+            savestate_node = self.ast_builder.down(NT.Instr)
+
+            self.add_and_consume(classname=NT.Move)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.JUMP:
+            savestate_node = self.ast_builder.down(NT.Jump)
+
+            self.consume_next_token()
+
+            if self.LTT(1) in self.RELATION.keys():
+                self.add_and_consume(mapping=self.RELATION)
+            else:
+                self.add(classname=NT.NOP)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            if self.LTT(1) == TT.SEMICOLON:
+                self.consume_next_token()
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.INT:
+            savestate_node = self.ast_builder.down(NT.Int)
+
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            self.ast_builder.up(savestate_node)
+        elif self.LTT(1) == TT.RTI:
+            self.add_and_consume(classname=NT.Rti)
+        else:
+            # error
+            pass
