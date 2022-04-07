@@ -1,6 +1,5 @@
 #  from code_generator import CodeGenerator
 import global_vars
-from reti import RETI
 
 
 class ASTNode:

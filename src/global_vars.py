@@ -5,8 +5,8 @@ class Args:
         self.tokens = True
         self.abstract_syntax = True
         self.print = True
-        self.begin_data_segment = 128
-        self.end_data_segment = 256
+        self.begin_data_segment = 10
+        self.end_data_segment = 20
         self.distance = 20
         self.verbose = True
         self.sight = 2

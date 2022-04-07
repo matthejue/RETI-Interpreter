@@ -3,14 +3,26 @@ from abstract_syntax_tree import ASTNode
 
 class NT:
     class Program(ASTNode):
-        __match_args__ = ("children",)
+        def update_match_args(self):
+            self.instructions = self.children
+            for instr in self.instructions:
+                instr.update_match_args()
+
+        __match_args__ = ("instructions",)
 
     class Instr(ASTNode):
+        def update_match_args(self):
+            self.instruction = self.children[0]
+            self.argument1 = self.children[1]
+            self.argument2 = self.children[2]
+            if len(self.children) == 4:
+                self.argument3 = self.children[3]
+
         __match_args__ = (
-            "children[0]",
-            "children[1]",
-            "children[2]",
-            "children[3]",
+            "instruction",
+            "argument1",
+            "argument2",
+            "argument3",
         )
 
     class Add(ASTNode):
@@ -77,30 +89,6 @@ class NT:
         pass
 
     class Move(ASTNode):
-        pass
-
-    class Acc(ASTNode):
-        pass
-
-    class In1(ASTNode):
-        pass
-
-    class In2(ASTNode):
-        pass
-
-    class Pc(ASTNode):
-        pass
-
-    class Sp(ASTNode):
-        pass
-
-    class Baf(ASTNode):
-        pass
-
-    class Cs(ASTNode):
-        pass
-
-    class Ds(ASTNode):
         pass
 
     class Print(ASTNode):

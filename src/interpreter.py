@@ -23,8 +23,8 @@ class Interpreter(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=100)
-    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=200)
+    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=10)
+    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=20)
     cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-S", "--sight", type=int, default=0)
@@ -220,7 +220,6 @@ class Interpreter(cmd2.Cmd):
 
         abstract_syntax_tree = grammar.reveal_ast()
         #  error_handler.handle(abstract_syntax_tree.interp)
-        __import__("pudb").set_trace()
         reti_state = Interp_RETI().interp_program(abstract_syntax_tree)
 
         #  # show warnings before reti code gets output
