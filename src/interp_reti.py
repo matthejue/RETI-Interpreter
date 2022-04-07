@@ -21,41 +21,57 @@ class Interp_RETI:
     def interp_instruction(self, instr, reti):
         match instr:
             case NT.Instr(NT.Add(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] + self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] + self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Addi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] + int(val)
             case NT.Instr(NT.Sub(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] - self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] - self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Subi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] - int(val)
             case NT.Instr(NT.Mult(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] * self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] * self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Multi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] * int(val)
             case NT.Instr(NT.Div(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] // self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] // self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Divi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] // int(val)
             case NT.Instr(NT.Mod(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] % self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] % self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Modi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] % int(val)
             case NT.Instr(NT.Oplus(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] ^ self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] ^ self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Oplusi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] ^ int(val)
             case NT.Instr(NT.Or(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] | self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] | self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Ori(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] | int(val)
             case NT.Instr(NT.And(), NT.Reg(reg), arg):
-                reti.registers[reg] = reti.registers[reg] & self.interp_memory(arg, reti)
+                reti.registers[reg] = reti.registers[reg] & self.interp_memory(
+                    arg, reti
+                )
             case NT.Instr(NT.Andi(), NT.Reg(reg), NT.Immediate(val)):
                 reti.registers[reg] = reti.registers[reg] & int(val)
             case NT.Instr(NT.Load(), NT.Reg(reg), arg):  # arg=M(i)
                 reti.registers[reg] = self.interp_memory(arg, reti)
-            case NT.Instr(NT.Loadin(), reg_base, NT.Reg(reg), deref):
-                #  reti.registers[reg] = self.interp_memory(reg_base, reti, self.interp_memory(deref, reti))
+            #  case NT.Instr(NT.Loadin(), reg_base, NT.Reg(reg), deref):
+            #      reti.registers[reg] = self.interp_memory(reg_base, reti, self.interp_memory(deref, reti))
             # TODO: continue here
             #  case NT.Instr(NT.Loadi(), NT.Reg(reg), NT.Immediate(val)):
             #  case NT.Instr(NT.Store(), NT.Reg(reg), NT.Immediate(val)):
