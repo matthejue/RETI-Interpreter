@@ -54,7 +54,6 @@ class TT(Enum):
     JUMP = "JUMP"
     INT = "INT"
     RTI = "RETI"
-    CALL = "CALL"
     REG = "register"
     IMMEDIATE = "immediate"
     LT = "<"
@@ -69,7 +68,7 @@ class TT(Enum):
     EOF = "end of file"
 
 
-NOT_TO_MAP = ("immediate", "register")
+NOT_TO_MAP = ("immediate", "register", "end of file", ";")
 RELATIONS = ("<", "<=", ">", ">=", "=", "==", "!=", "<>")
 
 STRING_TO_TT_RELATION = {
@@ -97,9 +96,7 @@ STRING_TO_TT_INSTRUCTION = {
     for value in (
         value
         for key, value in TT.__dict__.items()
-        if not key.startswith("_")
-        and value.value not in NOT_TO_MAP
-        and len(value.value) >= 2
+        if not key.startswith("_") and value.value not in NOT_TO_MAP + RELATIONS
     )
 }
 
@@ -225,7 +222,5 @@ class Lexer:
         else:
             self.lc = self.finput[self.lc_row][self.lc_col]
 
-    def __repr__(
-        self,
-    ):
+    def __repr__(self):
         return str(self.finput)
