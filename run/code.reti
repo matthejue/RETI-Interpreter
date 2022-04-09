@@ -1,0 +1,7 @@
+# let's a go
+CALL INPUT;
+MOVE ACC IN1;
+CALL INPUT;  # inline comment
+ADD ACC IN1;
+CALL PRINT;
+JUMP 0;

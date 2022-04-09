@@ -1,8 +1,15 @@
 from reti_ast import NT
 from reti import RETI
+import global_vars
+import os
+from instruction_grammar import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
 
 
 class Interp_RETI:
+    # when the <outabse>.out file gets written for the first time it should
+    # overwrite everything else
+    first_write = True
+
     def interp_jump_condition(self, condition, jumplength, reti):
         if condition:
             reti.registers["PC"] += jumplength
@@ -92,7 +99,7 @@ class Interp_RETI:
                 operation,
                 NT.Reg() as destination,
                 (NT.Immediate() | NT.Reg()) as source,
-            ):
+            ) if type(operation) in COMPUTE_INSTRUCTION.values():
                 self.interp_memory_store(
                     destination,
                     self.interp_operation(
@@ -103,7 +110,9 @@ class Interp_RETI:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(operation, NT.Reg() as destination, NT.Immediate(val)):
+            case NT.Instr(
+                operation, NT.Reg() as destination, NT.Immediate(val)
+            ) if type(operation) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
                 # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
                 self.interp_memory_store(
                     destination,
@@ -168,46 +177,99 @@ class Interp_RETI:
                 reti.registers["PC"] += 1
             case NT.Jump(relation, NT.Immediate(val)):
                 match relation:
-                    case NT.LT():
+                    case NT.Lt():
                         self.interp_jump_condition(
                             0 < reti.registers["ACC"], int(val), reti
                         )
-                    case NT.LTE():
+                    case NT.Lte():
                         self.interp_jump_condition(
                             0 <= reti.registers["ACC"], int(val), reti
                         )
-                    case NT.GT():
+                    case NT.Gt():
                         self.interp_jump_condition(
                             0 > reti.registers["ACC"], int(val), reti
                         )
-                    case NT.GTE():
+                    case NT.Gte():
                         self.interp_jump_condition(
                             0 >= reti.registers["ACC"], int(val), reti
                         )
-                    case (NT.EQ() | NT.EQ2()):
+                    case (NT.Eq()):
                         self.interp_jump_condition(
                             0 == reti.registers["ACC"], int(val), reti
                         )
-                    case (NT.NEQ() | NT.NEQ2()):
+                    case (NT.Neq()):
                         self.interp_jump_condition(
                             0 != reti.registers["ACC"], int(val), reti
                         )
+                    case (NT.Always()):
+                        self.interp_jump_condition(True, int(val), reti)
+                    case (NT.Nop()):
+                        self.interp_jump_condition(False, int(val), reti)
             case NT.Int(NT.Immediate(val)):
-                # save PC
+                # save PC to stack
+                reti.sram[reti.registers["SP"]] = reti.registers["PC"]
+                reti.registers["SP"] = reti.registers["SP"] - 1
                 # jump to start address of isr
-                self.interp_memory_store(
-                    NT.Reg("PC"), self.interp_memory_load(abs(int(val)), reti), reti
-                )
+                reti.registers["PC"] = reti.sram[abs(int(val))]
             case NT.Rti():
-                ...
+                # restore PC
+                reti.registers["PC"] = reti.sram[reti.registers["SP"] + 1]
+                # delete PC from stack
+                reti.registers["SP"] = reti.registers["SP"] + 1
+            case NT.Call(NT.Name("PRINT")):
+                print(reti.registers["ACC"])
+                if global_vars.outbase:
+                    if self.first_write:
+                        with open(
+                            global_vars.outbase + ".out", "w", encoding="utf-8"
+                        ) as fout:
+                            fout.write(str(reti.registers["ACC"]))
+                        self.first_write = False
+                    else:
+                        with open(
+                            global_vars.outbase + ".out", "a", encoding="utf-8"
+                        ) as fout:
+                            fout.write("\n" + str(reti.registers["ACC"]))
+                reti.registers["PC"] += 1
+            case NT.Call(NT.Name("INPUT")):
+                if global_vars.test_input:
+                    reti.registers["ACC"] = global_vars.test_input.pop()
+                else:
+                    reti.registers["ACC"] = int(input())
+                reti.registers["PC"] += 1
+
+    def preconfigs(self, p, reti):
+        # necessary for the __match_case__ of the nodes to work
+        p.update_match_args()
+        # set the CS, PC, DS and SP Register properly
+        reti.registers["CS"] = global_vars.args.process_begin
+        reti.registers["PC"] = global_vars.args.process_begin
+        reti.registers["DS"] = global_vars.args.process_begin + len(p.children)
+        reti.registers["SP"] = (
+            global_vars.args.process_begin
+            + len(p.children)
+            + global_vars.args.datasegment_size
+        )
+        if global_vars.args.print:
+            print("\nOutput:")
+        if os.path.isfile(global_vars.outbase + ".in"):
+            with open(global_vars.outbase + ".in", "r", encoding="utf-8") as fin:
+                global_vars.test_input = list(
+                    reversed([int(line) for line in fin.readlines()])
+                )
 
     def interp_program(self, p):
-        p.update_match_args()
+        reti = RETI(p.children)
+        self.preconfigs(p, reti)
         match p:
             case NT.Program(instructions):
-                reti = RETI()
-                next_instr = reti.registers["PC"]
-                while next_instr < len(instructions):
-                    self.interp_instruction(instructions[next_instr], reti)
-                    next_instr = reti.registers["PC"]
+                while True:
+                    next_instruction = instructions[
+                        reti.registers["PC"] - global_vars.args.process_begin
+                    ]
+                    match next_instruction:
+                        case NT.Jump(NT.Always(), NT.Immediate("0")):
+                            break
+                        case _:
+                            self.interp_instruction(next_instruction, reti)
                 return reti

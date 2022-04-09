@@ -26,17 +26,17 @@ def main():
     else:
         CM().color_off()
 
-    infile = global_vars.args.infile
-    outbase = remove_extension(infile)
+    global_vars.outbase = remove_extension(global_vars.args.infile)
 
     try:
-        interpreter.read_and_write_file(infile, outbase)
+        interpreter.read_and_write_file()
     except FileNotFoundError:
         print("File does not exist\n")
-    except:
-        print(
-            f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
-        )
+    # TODO: Uncomment before release
+    #  except:
+    #      print(
+    #          f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
+    #      )
     else:
         print(
             f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"

@@ -97,44 +97,35 @@ class NT:
     class Move(ASTNode):
         pass
 
-    class Print(ASTNode):
-        pass
-
-    class Input(ASTNode):
-        pass
-
     class Jump(ASTNode):
         def update_match_args(self):
             self.relation = self.children[0]
-            self.jumplenght = self.children[1]
+            self.jumplength = self.children[1]
 
         __match_args__ = ("relation", "jumplength")
 
-    class NOP(ASTNode):
+    class Lt(ASTNode):
         pass
 
-    class LT(ASTNode):
+    class Lte(ASTNode):
         pass
 
-    class LTE(ASTNode):
+    class Gt(ASTNode):
         pass
 
-    class GT(ASTNode):
+    class Gte(ASTNode):
         pass
 
-    class GTE(ASTNode):
+    class Eq(ASTNode):
         pass
 
-    class EQ(ASTNode):
+    class Neq(ASTNode):
         pass
 
-    class EQ2(ASTNode):
+    class Always(ASTNode):
         pass
 
-    class NEQ(ASTNode):
-        pass
-
-    class NEQ2(ASTNode):
+    class Nop(ASTNode):
         pass
 
     class Int(ASTNode):
@@ -149,12 +140,11 @@ class NT:
     class Call(ASTNode):
         def update_match_args(self):
             self.functionname = self.children[0]
-            self.argument = self.children[1]
 
-        __match_args__ = (
-            "functionname",
-            "argument",
-        )
+        __match_args__ = ("functionname",)
+
+    class Name(ASTNode):
+        pass
 
     class Reg(ASTNode):
         pass

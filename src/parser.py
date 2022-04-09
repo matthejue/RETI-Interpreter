@@ -69,14 +69,14 @@ class LL_Recursive_Decent_Parser:
         :mapping: dictionray from which the right nodetype gets determined by
         the LTT
         """
-        self.add(classname, mapping)
+        self._add(classname, mapping)
         self.match(tokentypes)
 
     def add_and_consume(self, classname=None, mapping=None):
-        self.add(classname, mapping)
+        self._add(classname, mapping)
         self.consume_next_token()
 
-    def add(self, classname=None, mapping=None):
+    def _add(self, classname=None, mapping=None):
         """Add the node with the given classname if given or else right
         nodetype matching the tokentype of the current token and with the right
         tokenvalue to the ast

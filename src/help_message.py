@@ -49,11 +49,11 @@ def generate_help_message():
     -a, --abstract-syntax
     >                     also write the abstract syntax
     -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
-    -b, --begin_data_segment BEGIN_DATA_SEGMENT
-    >                     where the datasegment starts (default `100`)
-    -e, --end_data_segment END_DATA_SEGMENT
-    >                     where the datasegment ends and where the stackpointer starts (default `200`)
-    -d, --distance DISTANCE
+    -b, --process_begin PROCESS_BEGIN
+    >                     where the process starts in memory (default memory cell `8`)
+    -d, --datasegment_size DATASEGMENT_SIZE
+    >                     default size for the datasegment (default size `32`)
+    -D, --distance DISTANCE
     >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
     -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
     -S, --sight SIGHT     sets the number of lines visible around a error message

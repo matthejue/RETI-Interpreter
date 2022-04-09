@@ -54,8 +54,10 @@ class TT(Enum):
     JUMP = "JUMP"
     INT = "INT"
     RTI = "RETI"
+    CALL = "CALL"
     REG = "register"
     IMMEDIATE = "immediate"
+    NAME = "name"
     LT = "<"
     LTE = "<="
     GT = ">"
@@ -64,12 +66,23 @@ class TT(Enum):
     EQ2 = "=="
     NEQ = "!="
     NEQ2 = "<>"
+    NOP = "_NOP"
     SEMICOLON = ";"
     EOF = "end of file"
 
 
-NOT_TO_MAP = ("immediate", "register", "end of file", ";")
-RELATIONS = ("<", "<=", ">", ">=", "=", "==", "!=", "<>")
+NOT_TO_MAP = ("immediate", "register", "name", "end of file", ";")
+RELATIONS = (
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "=",
+    "==",
+    "!=",
+    "<>",
+    "_NOP",
+)
 
 STRING_TO_TT_RELATION = {
     value.value: value
@@ -142,34 +155,36 @@ class Lexer:
                 # :grammar: ;
                 self.next_char()
                 return Token(TT.SEMICOLON, self.c, self.position)
-            elif self.lc in "<>=!":
-                # :grammar: <|<=|>|>=|=|==|!=|<>
+            elif self.lc in "<>=!_":
+                # :grammar: <|<=|>|>=|=|==|!=|<>|_NOP
                 self.next_char()
-                if STRING_TO_TT_RELATION.get(self.c + self.lc):
-                    symbol = self.c + self.lc
+                relation = self.c
+                while self.lc in self.LETTER + "=>":
                     self.next_char()
+                    relation += self.c
+                if STRING_TO_TT_RELATION.get(relation):
                     return Token(
-                        STRING_TO_TT_RELATION[symbol],
-                        symbol,
+                        STRING_TO_TT_RELATION[relation],
+                        relation,
                         self.position,
                     )
-                return Token(STRING_TO_TT_RELATION[self.c], self.c, self.position)
+                else:
+                    raise Errors.InvalidWordError(relation, self.position)
             elif self.lc in self.LETTER:
                 # word, i.e. instruction or register
                 # :grammar:
                 self.next_char()
-                symbol = self.c
-                while self.lc in self.LETTER:
+                word = self.c
+                # 1 and 2 are because of IN1 and IN2
+                while self.lc in self.LETTER + "12":
                     self.next_char()
-                    symbol += self.c
-                if symbol in REGISTER:
-                    return Token(TT.REG, symbol, self.position)
-                elif STRING_TO_TT_INSTRUCTION.get(symbol):
-                    return Token(
-                        STRING_TO_TT_INSTRUCTION[symbol], symbol, self.position
-                    )
+                    word += self.c
+                if word in REGISTER:
+                    return Token(TT.REG, word, self.position)
+                elif STRING_TO_TT_INSTRUCTION.get(word):
+                    return Token(STRING_TO_TT_INSTRUCTION[word], word, self.position)
                 else:
-                    raise Errors.InvalidWordError(symbol, self.position)
+                    return Token(TT.NAME, word, self.position)
             elif self.lc in self.DIGIT_WITH_ZERO + "-":
                 # number
                 # :grammar:
@@ -178,16 +193,19 @@ class Lexer:
                     return Token(TT.IMMEDIATE, self.c, self.position)
                 elif self.lc == "-":
                     self.next_char()
-                    symbol = self.c
+                    number = self.c
                     if self.lc not in self.DIGIT_WITHOUT_ZERO:
                         raise Errors.InvalidNumberError("digit", self.lc, self.position)
                 else:
                     self.next_char()
-                    symbol = self.c
+                    number = self.c
                 while self.lc in self.DIGIT_WITH_ZERO:
                     self.next_char()
-                    symbol += self.c
-                return Token(TT.IMMEDIATE, symbol, self.position)
+                    number += self.c
+                return Token(TT.IMMEDIATE, number, self.position)
+            elif self.lc == "#":
+                self.lc_col = len(self.finput[self.lc_row]) - 1
+                self.next_char()
             else:
                 raise Errors.InvalidCharacterError(self.lc, self.position)
         return Token(TT.EOF, self.lc, self.position)
@@ -208,8 +226,8 @@ class Lexer:
             self.lc_col = 0
         elif (
             self.lc_col == len(self.finput[self.lc_row]) - 1
-            and self.lc_row == len(self.finput)
-        ) - 1:
+            and self.lc_row == len(self.finput) - 1
+        ):
             self.lc_col += 1
 
         # next character

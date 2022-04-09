@@ -23,15 +23,16 @@ class Interpreter(cmd2.Cmd):
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
     cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
-    cli_args_parser.add_argument("-b", "--begin_data_segment", type=int, default=8)
-    cli_args_parser.add_argument("-e", "--end_data_segment", type=int, default=32)
-    cli_args_parser.add_argument("-d", "--distance", type=int, default=0)
+    cli_args_parser.add_argument("-b", "--process_begin", type=int, default=8)
+    cli_args_parser.add_argument("-d", "--datasegment_size", type=int, default=32)
+    cli_args_parser.add_argument("-D", "--distance", type=int, default=0)
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-s", "--sight", type=int, default=0)
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-E", "--eprom_size", type=int, default=16)
     cli_args_parser.add_argument("-U", "--uart_size", type=int, default=4)
     cli_args_parser.add_argument("-S", "--sram_size", type=int, default=32)
+    cli_args_parser.add_argument("-g", "--debug", action="store_true")
 
     #  cli_args_parser.add_argument(
     #      '-O',
@@ -48,9 +49,7 @@ class Interpreter(cmd2.Cmd):
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/reti_interpreter/settings.conf"
     PERSISTENT_HISTORY_LENGTH = 100
 
-    def __init__(
-        self,
-    ):
+    def __init__(self):
         global_vars.args = self.cli_args_parser.parse_args()
         if not global_vars.args.infile:
             self._shell__init__()
@@ -158,7 +157,7 @@ class Interpreter(cmd2.Cmd):
         global_vars.args.print = True
 
         try:
-            self._compile(args.infile.split("\n"), "stdin")
+            self._interpret(args.infile.split("\n"), "stdin")
         except:
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
@@ -171,14 +170,14 @@ class Interpreter(cmd2.Cmd):
     def do_help(self, _):
         print(generate_help_message())
 
-    def read_and_write_file(self, infile, outbase):
+    def read_and_write_file(self):
         """reads a pico_c file and compiles it
         :returns: pico_c Code compiled in RETI Assembler
         """
-        with open(infile, encoding="utf-8") as fin:
+        with open(global_vars.args.infile, encoding="utf-8") as fin:
             pico_c_in = fin.readlines()
 
-        self._compile(pico_c_in, infile, outbase)
+        self._interpret(pico_c_in)
 
     #  def _reset(self, fname, finput):
     #      # Singletons have to be reset manually for the shell
@@ -188,7 +187,10 @@ class Interpreter(cmd2.Cmd):
     #      else:
     #          WarningHandler().__init__(fname, finput)
 
-    def _compile(self, code, infile, outbase=None):
+    def _interpret(self, code):
+        if global_vars.args.debug:
+            __import__("pudb").set_trace()
+
         # remove all empty lines and \n from the code lines in the list
         code_without_cr = list(
             filter(lambda line: line, map(lambda line: line.strip("\n"), code))
@@ -210,7 +212,7 @@ class Interpreter(cmd2.Cmd):
 
         if global_vars.args.tokens:
             #  error_handler.handle(self._tokens_option, lexer, outbase)
-            self._tokens_option(lexer, outbase)
+            self._tokens_option(lexer)
             lexer.__init__(code_without_cr)
 
         # Generate ast
@@ -219,7 +221,7 @@ class Interpreter(cmd2.Cmd):
         grammar.start_parse()
 
         if global_vars.args.abstract_syntax:
-            self._abstract_syntax_option(grammar, outbase)
+            self._abstract_syntax_option(grammar)
 
         abstract_syntax_tree = grammar.reveal_ast()
         #  error_handler.handle(abstract_syntax_tree.interp)
@@ -228,9 +230,9 @@ class Interpreter(cmd2.Cmd):
         #  # show warnings before reti code gets output
         #  warning_handler.show_warnings()
 
-        self._reti(reti_state, outbase)
+        self._reti(reti_state)
 
-    def _tokens_option(self, lexer, outbase):
+    def _tokens_option(self, lexer):
         tokens = []
         t = lexer.next_token()
         while t.type != TT.EOF:
@@ -242,21 +244,21 @@ class Interpreter(cmd2.Cmd):
             tokens_str = str(tokens)
             print("\n" + tokens_str)
 
-        if outbase:
-            with open(outbase + ".tokens", "w", encoding="utf-8") as fout:
+        if global_vars.outbase:
+            with open(global_vars.outbase + ".tokens", "w", encoding="utf-8") as fout:
                 fout.write(str(tokens))
 
-    def _abstract_syntax_option(self, grammar: Grammar, outbase):
+    def _abstract_syntax_option(self, grammar: Grammar):
         if global_vars.args.print:
             ast = str(grammar.reveal_ast())
             #  ast = Colorizer(ast).colorize_abstract_syntax()
             print("\n" + ast)
 
-        if outbase:
-            with open(outbase + ".ast", "w", encoding="utf-8") as fout:
+        if global_vars.outbase:
+            with open(global_vars.outbase + ".ast", "w", encoding="utf-8") as fout:
                 fout.write(str(grammar.reveal_ast()))
 
-    def _reti(self, reti_state, outbase):
+    def _reti(self, reti_state):
         if global_vars.args.print:
             #  code = (
             #      Colorizer(
@@ -266,8 +268,10 @@ class Interpreter(cmd2.Cmd):
             #      else str(abstract_syntax_tree.show_generated_code())
             #  )
             print("\n" + str(reti_state))
-        if outbase:
-            with open(outbase + ".reti_state", "w", encoding="utf-8") as fout:
+        if global_vars.outbase:
+            with open(
+                global_vars.outbase + ".reti_state", "w", encoding="utf-8"
+            ) as fout:
                 fout.write(str(reti_state))
 
 

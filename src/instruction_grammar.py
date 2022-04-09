@@ -5,76 +5,62 @@ from parser import LL_Recursive_Decent_Parser
 from itertools import chain
 
 
+COMPUTE_INSTRUCTION = {
+    TT.ADD: NT.Add,
+    TT.SUB: NT.Sub,
+    TT.MULT: NT.Mult,
+    TT.DIV: NT.Div,
+    TT.MOD: NT.Mod,
+    TT.OPLUS: NT.Oplus,
+    TT.OR: NT.Or,
+    TT.AND: NT.And,
+}
+
+COMPUTE_IMMEDIATE_INSTRUCTION = {
+    TT.ADDI: NT.Addi,
+    TT.SUBI: NT.Subi,
+    TT.MULTI: NT.Multi,
+    TT.DIVI: NT.Divi,
+    TT.MODI: NT.Modi,
+    TT.OPLUSI: NT.Oplusi,
+    TT.ORI: NT.Ori,
+    TT.ANDI: NT.Andi,
+}
+
+RELATION = {
+    TT.LT: NT.Lt,
+    TT.LTE: NT.Lte,
+    TT.GT: NT.Gt,
+    TT.GTE: NT.Gte,
+    TT.EQ: NT.Eq,
+    TT.EQ2: NT.Eq,
+    TT.NEQ: NT.Neq,
+    TT.NEQ2: NT.Neq,
+    TT.NOP: NT.Nop,
+}
+
+OTHER_INSTRUCTION = {
+    TT.LOAD,
+    TT.LOADIN,
+    TT.LOADI,
+    TT.STORE,
+    TT.STOREIN,
+    TT.MOVE,
+    TT.JUMP,
+    TT.INT,
+    TT.RTI,
+    TT.CALL,
+}
+
+
 class InstructionGrammar(LL_Recursive_Decent_Parser):
-
-    COMPUTE_INSTRUCTION = {
-        TT.ADD: NT.Add,
-        TT.SUB: NT.Sub,
-        TT.MULT: NT.Mult,
-        TT.DIV: NT.Div,
-        TT.MOD: NT.Mod,
-        TT.OPLUS: NT.Oplus,
-        TT.OR: NT.Or,
-        TT.AND: NT.And,
-    }
-
-    COMPUTE_IMMEDIATE_INSTRUCTION = {
-        TT.ADDI: NT.Addi,
-        TT.SUBI: NT.Subi,
-        TT.MULTI: NT.Multi,
-        TT.DIVI: NT.Divi,
-        TT.MODI: NT.Modi,
-        TT.OPLUSI: NT.Oplusi,
-        TT.ORI: NT.Ori,
-        TT.ANDI: NT.Andi,
-    }
-
-    RELATION = {
-        TT.LT: NT.LT,
-        TT.LTE: NT.LTE,
-        TT.GT: NT.GT,
-        TT.GTE: NT.GTE,
-        TT.EQ: NT.EQ,
-        TT.EQ2: NT.EQ2,
-        TT.NEQ: NT.NEQ,
-        TT.NEQ2: NT.NEQ2,
-    }
-
-    OTHER_INSTRUCTION = {
-        TT.LOAD,
-        TT.LOADIN,
-        TT.LOADI,
-        TT.STORE,
-        TT.STOREIN,
-        TT.MOVE,
-        TT.JUMP,
-        TT.INT,
-        TT.RTI,
-    }
-
-    def code_instr(self):
-        savestate_node = self.ast_builder.down(NT.Program)
-
-        while self.LTT(1) in chain(
-            self.COMPUTE_INSTRUCTION.keys(),
-            self.COMPUTE_IMMEDIATE_INSTRUCTION.keys(),
-            self.OTHER_INSTRUCTION,
-        ):
-            self._instr()
-
-        self.ast_builder.up(savestate_node)
-
     def _instr(self):
-        """instruction
-
-        :concrete:
-        :abstract: abstract grammar specification
-        """
-        if self.LTT(1) in self.COMPUTE_INSTRUCTION.keys():
+        """instruction"""
+        if self.LTT(1) in COMPUTE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_INSTRUCTION> <REGISTER> (<REGISTER>|<Immediate>)
             savestate_node = self.ast_builder.down(NT.Instr)
 
-            self.add_and_consume(mapping=self.COMPUTE_INSTRUCTION)
+            self.add_and_consume(mapping=COMPUTE_INSTRUCTION)
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
@@ -83,22 +69,20 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
             elif self.LTT(1) == TT.IMMEDIATE:
                 self.add_and_consume(classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
-        elif self.LTT(1) in self.COMPUTE_IMMEDIATE_INSTRUCTION.keys():
+        elif self.LTT(1) in COMPUTE_IMMEDIATE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_IMMEDIATE_INSTRUCTION> <REGISTER> <Immediate>
             savestate_node = self.ast_builder.down(NT.Instr)
 
-            self.add_and_consume(mapping=self.COMPUTE_IMMEDIATE_INSTRUCTION)
+            self.add_and_consume(mapping=COMPUTE_IMMEDIATE_INSTRUCTION)
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOAD:
@@ -110,8 +94,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADIN:
@@ -125,8 +108,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADI:
@@ -138,8 +120,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STORE:
@@ -151,8 +132,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STOREIN:
@@ -166,8 +146,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.MOVE:
@@ -179,8 +158,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.JUMP:
@@ -188,25 +166,53 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
 
             self.consume_next_token()
 
-            if self.LTT(1) in self.RELATION.keys():
-                self.add_and_consume(mapping=self.RELATION)
+            if self.LTT(1) in RELATION.keys():
+                self.add_and_consume(mapping=RELATION)
             else:
-                self.add(classname=NT.NOP)
+                savestate_node = self.ast_builder.down(NT.Always)
+                self.ast_builder.up(savestate_node)
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
 
-            if self.LTT(1) == TT.SEMICOLON:
-                self.consume_next_token()
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.INT:
             savestate_node = self.ast_builder.down(NT.Int)
 
+            self.consume_next_token()
+
             self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+
+            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.RTI:
             self.add_and_consume(classname=NT.Rti)
+
+            self.match([TT.SEMICOLON])
+        elif self.LTT(1) == TT.CALL:
+            savestate_node = self.ast_builder.down(NT.Call)
+
+            self.consume_next_token()
+
+            self.add_and_match([TT.NAME], classname=NT.Name)
+
+            self.match([TT.SEMICOLON])
+
+            self.ast_builder.up(savestate_node)
         else:
             # error
             pass
+
+    def code_instr(self):
+        savestate_node = self.ast_builder.down(NT.Program)
+
+        while self.LTT(1) in chain(
+            COMPUTE_INSTRUCTION.keys(),
+            COMPUTE_IMMEDIATE_INSTRUCTION.keys(),
+            OTHER_INSTRUCTION,
+        ):
+            self._instr()
+
+        self.ast_builder.up(savestate_node)
