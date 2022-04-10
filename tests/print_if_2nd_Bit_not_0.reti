@@ -1,10 +1,10 @@
 # in:7
 # except:42
-CALL INPUT;
-DIVI ACC 2;
-MULTI ACC 2097152;
-MULTI ACC 1024;
-JUMP= 3;
-LOADI ACC 42;
-CALL PRINT;
-JUMP 0;
+call input;
+divi acc 2;
+multi acc 2097152;
+multi acc 1024;
+jump= 3;
+loadi acc 42;
+call print;
+jump 0;

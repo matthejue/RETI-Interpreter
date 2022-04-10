@@ -1,0 +1,17 @@
+# in:7 2 3
+# except:32142
+call input;
+# put acc in in1 directly
+move acc in1;
+call input;
+# put acc in in2 over stack
+storein sp acc 1;
+subi sp 1;
+loadin sp in2 0;
+addi sp 1;
+call input;
+call print;
+mult acc in1;
+call print;
+mult acc in2;
+call print;

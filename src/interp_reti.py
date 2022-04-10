@@ -85,11 +85,11 @@ class Interp_RETI:
                 memory_type = source >> 30
                 match memory_type:
                     case 0b00:
-                        return reti.eprom[source << 2 >> 2]
+                        return reti.eprom[((source << 2) % 2**32) >> 2]
                     case 0b01:
-                        return reti.uart[source << 2 >> 2]
+                        return reti.uart[((source << 2) % 2**32) >> 2]
                     case _:
-                        return reti.sram[source << 2 >> 2]
+                        return reti.sram[((source << 2) % 2**32) >> 2]
             case _:
                 #  raise TODO: sich hier was überlegen
                 ...
@@ -249,12 +249,15 @@ class Interp_RETI:
     def preconfigs(self, p, reti):
         # set the CS, PC, DS and SP Register properly
         reti.registers["CS"] = global_vars.args.process_begin
-        reti.registers["PC"] = global_vars.args.process_begin
-        reti.registers["DS"] = global_vars.args.process_begin + len(p.children)
+        reti.registers["PC"] = global_vars.args.process_begin + 2**31
+        reti.registers["DS"] = (
+            global_vars.args.process_begin + len(p.children) + 2**31
+        )
         reti.registers["SP"] = (
             global_vars.args.process_begin
             + len(p.children)
             + global_vars.args.datasegment_size
+            + 2**31
         )
         if os.path.isfile(global_vars.outbase + ".in"):
             with open(global_vars.outbase + ".in", "r", encoding="utf-8") as fin:
@@ -271,7 +274,7 @@ class Interp_RETI:
             case NT.Program(_, instructions):
                 while True:
                     next_instruction = instructions[
-                        reti.registers["PC"] - global_vars.args.process_begin
+                        reti.registers["PC"] - global_vars.args.process_begin - 2**31
                     ]
                     match next_instruction:
                         case NT.Jump(NT.Always(), NT.Immediate("0")):
