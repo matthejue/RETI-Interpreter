@@ -1,3 +1,5 @@
+# in:7
+# except:42
 CALL INPUT;
 DIVI ACC 2;
 MULTI ACC 2097152;

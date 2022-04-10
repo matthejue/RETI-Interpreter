@@ -10,12 +10,12 @@ class Args:
         self.process_begin = 8
         self.datasegment_size = 32
         self.distance = 20
-        self.verbose = True
         self.sight = 2
-        self.color = True
-        self.eprom_size = 16
+        self.eprom_size = 8
         self.uart_size = 4
         self.sram_size = 0
+        self.color = True
+        self.verbose = False
         self.debug = False
         self.show_error_messages = False
 

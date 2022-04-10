@@ -259,7 +259,7 @@ class Interp_RETI:
         if os.path.isfile(global_vars.outbase + ".in"):
             with open(global_vars.outbase + ".in", "r", encoding="utf-8") as fin:
                 global_vars.test_input = list(
-                    reversed([int(line) for line in fin.readlines()])
+                    reversed([int(line) for line in fin.readline().split(" ")])
                 )
 
     def interp_program(self, p: NT.Program):
@@ -280,7 +280,13 @@ class Interp_RETI:
                                 and not global_vars.args.verbose
                             ):
                                 self._reti_state_option(reti)
+                            # needs a newline at the end, else it differs from .out_except
+                            with open(
+                                global_vars.outbase + ".out", "a", encoding="utf-8"
+                            ) as fout:
+                                fout.write("\n")
                             break
+
                         case _:
                             self.interp_instruction(next_instruction, reti)
                     if global_vars.args.reti_state and global_vars.args.verbose:

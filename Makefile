@@ -1,33 +1,36 @@
-# TEST_FILENAMES = $(shell basename -a $(wildcard ./tests/*.picoc))
-ARG_BASE = $(shell basename --suffix=.picoc $(ARG))
+ARG_BASE = $(shell basename --suffix=.reti $(ARG))
 .PHONY: all test clean
 
 all: read-all-color
 
-read-all: _read_all clean
-_read-all:
-	./src/main.py -c -t -a -s -p -b 128 -e 256 -d 20 -S 2 ./run/code.picoc
+install:
+	ln -sr ./src/main.py /usr/local/bin/reti_interpreter
 
-read-all-verbose: _read-all-verbose clean
-_read-all-verbose:
-	./src/main.py -c -t -a -s -p -v -b 128 -e 256 -d 20 -S 2 ./run/code.picoc
+read: _read clean
+_read:
+	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m ./run/code.reti
 
-read-all-color: _read-all-color clean
-_read-all-color:
-	./src/main.py -c -t -a -s -p -v -b 128 -e 256 -d 20 -S 2 -C ./run/code.picoc
+read-verbose: _read-verbose clean
+_read-verbose:
+	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -v -m ./run/code.reti
+
+read-color: _read-color clean
+_read-color:
+	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m ./run/code.reti
 
 shell: _shell clean
 _shell:
 	./src/main.py
 
-test: _test clean
-_test:
-	./run_tests.sh
+extract:
+	./extract_input_and_except.sh
 
-test-arg: _test-arg clean
-_test-arg:
+test: _test clean
+test-extract: extract _test clean
+_test:
 	# start with 'make test-arg ARG=file_basename'
-	./run_tests.sh $(ARG_BASE)
+	# ARG2=-g if for debugging
+	./run_tests.sh $(ARG_BASE) $(ARG2)
 
 help:
 	./src/main.py -h -C
