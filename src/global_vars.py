@@ -1,9 +1,11 @@
 class Args:
     def __init__(self):
-        self.infile = ""
+        self.infile = "stdin"
         self.concrete_syntax = True
         self.tokens = True
         self.abstract_syntax = True
+        self.print_output = True
+        self.reti_state = True
         self.print = True
         self.process_begin = 8
         self.datasegment_size = 32
@@ -15,6 +17,7 @@ class Args:
         self.uart_size = 4
         self.sram_size = 0
         self.debug = False
+        self.show_error_messages = False
 
 
 # options from command-line arguments

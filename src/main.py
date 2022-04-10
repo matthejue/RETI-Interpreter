@@ -33,10 +33,12 @@ def main():
     except FileNotFoundError:
         print("File does not exist\n")
     # TODO: Uncomment before release
-    #  except:
-    #      print(
-    #          f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
-    #      )
+    except Exception as e:
+        print(
+            f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
+        )
+        if global_vars.args.show_error_messages:
+            raise e
     else:
         print(
             f"{CM().BRIGHT}{CM().WHITE}Compilation successfull{CM().RESET}{CM().RESET_ALL}\n"

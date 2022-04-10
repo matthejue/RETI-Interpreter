@@ -34,7 +34,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: reti_interpreter / interpret [-h] [-c] [-t] [-a] [-p] [-b BEGIN_DATA_SEGMENT] [-e END_DATA_SEGMENT] [-d DISTANCE] [-v] [-S SIGHT] [-C] [infile]
+    Usage: reti_interpreter / interpret [-h] [-c] [-t] [-a] [-o] [-r][-p] [-b PROCESS_BEGIN] [-d DATA_SEGMENT_SIZE] [-D DISTANCE] [-v] [-S SIGHT] [-C] [-g] [-m] [infile]
 
     Interprets RETI Code.
 
@@ -48,6 +48,10 @@ def generate_help_message():
     -t, --tokens          also write the tokenlist
     -a, --abstract-syntax
     >                     also write the abstract syntax
+    -o, --print-output
+    >                     also write the output from the print call
+    -r, --reti-state
+    >                     also write the state of the reti registers and memories for every instruction
     -p, --print           print all file outputs to the terminal. Is always activated in the shell. Doesn't have to be activated manually in the shell.
     -b, --process_begin PROCESS_BEGIN
     >                     where the process starts in memory (default memory cell `8`)
@@ -58,6 +62,9 @@ def generate_help_message():
     -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
     -S, --sight SIGHT     sets the number of lines visible around a error message
     -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
+    -g, --debug           starts the debugger in the code
+    -m, --show_error_messages
+    >                     show error messages from python
 
     {header("RETI Assembler", terminal_width, '=')}
     RETI Assembler is a minimalistic Asssembler language.
@@ -72,14 +79,14 @@ def generate_help_message():
     The shell can be exited again by typing `quit`.
 
     {header("interpret command", terminal_width, '~')}
-    PicoC Code can be compiled into RETI Code with the `interpret <cli options> "<code>";` command (shortcut `itp`).
-    The cli options are the same as for calling the compiler from outside, except for the `infile` argument which is interpreted as string with PicoC Code and which will be compiled as if it was enclosed in a main function.
+    RETI Code can be executed with the `interpret <cli options> "<code>";` command (shortcut `itp`).
+    The cli options are the same as for calling the interpreter from outside, except for the `infile` argument which is interpreted as string with RETI Code and which will get a 'JUMP 0' automatically added at the end of the RETI instructions.
 
     {header("most_used command", terminal_width, '~')}
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
-    `interpret -c -t -a -p -v -b 100 -e 200 -d 20 -S 2 "<code>";`
+    `interpret -c -t -a -o -r -p -v -b 8 -d 0 -D 20 -S 2 -m "<code>";`
 
     and shrinks it down to:
 

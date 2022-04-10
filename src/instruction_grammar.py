@@ -208,6 +208,8 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
     def code_instr(self):
         savestate_node = self.ast_builder.down(NT.Program)
 
+        self.add_and_match([TT.NAME], classname=NT.Programname)
+
         while self.LTT(1) in chain(
             COMPUTE_INSTRUCTION.keys(),
             COMPUTE_IMMEDIATE_INSTRUCTION.keys(),

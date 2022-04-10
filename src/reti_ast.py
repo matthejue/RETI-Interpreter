@@ -2,16 +2,20 @@ from abstract_syntax_tree import ASTNode
 
 
 class NT:
+    class Programname(ASTNode):
+        pass
+
     class Program(ASTNode):
         def update_match_args(self):
-            self.instructions = self.children
+            self.programname = self.children[0]
+            self.instructions = self.children[1:]
             for instr in self.instructions:
                 instr.update_match_args()
 
-        __match_args__ = ("instructions",)
-
-        def __repr__(self):
-            return self.alternative_to_string()
+        __match_args__ = (
+            "programname",
+            "instructions",
+        )
 
     class Instr(ASTNode):
         def update_match_args(self):
@@ -27,9 +31,6 @@ class NT:
             "argument2",
             "argument3",
         )
-
-        def __repr__(self):
-            return self.alternative_to_string()
 
     class Add(ASTNode):
         pass
@@ -104,6 +105,9 @@ class NT:
 
         __match_args__ = ("relation", "jumplength")
 
+        def __repr__(self):
+            return self.to_string_show_node()
+
     class Lt(ASTNode):
         pass
 
@@ -134,6 +138,9 @@ class NT:
 
         __match_args__ = ("isr",)
 
+        def __repr__(self):
+            return self.to_string_show_node()
+
     class Rti(ASTNode):
         pass
 
@@ -142,6 +149,9 @@ class NT:
             self.functionname = self.children[0]
 
         __match_args__ = ("functionname",)
+
+        def __repr__(self):
+            return self.to_string_show_node()
 
     class Name(ASTNode):
         pass

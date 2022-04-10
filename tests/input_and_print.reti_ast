@@ -1,0 +1,1 @@
+('INPUT_AND_PRINT' Call('INPUT') ('MOVE' 'ACC' 'IN1') Call('INPUT') ('ADD' 'ACC' 'IN1') Call('PRINT') Jump('Always' '0'))

@@ -30,18 +30,20 @@ class ASTNode:
         self.children += [node]
 
     def __repr__(self):
-        global_vars.show_node = True
+        global_vars.show_node = False
         return self.to_string()
 
     def to_string(self):
         if not self.children:
-            if not self.value and global_vars.args.verbose:
-                return self.__class__.__name__
-            return f"{self.value}"
+            if not self.value:
+                return f"'{self.__class__.__name__}'"
+            if global_vars.args.verbose:
+                return f"{self.__class__.__name__}('{self.value}')"
+            return f"'{self.value}'"
 
         acc = ""
 
-        if global_vars.args.verbose and global_vars.show_node:
+        if global_vars.args.verbose or global_vars.show_node:
             acc += self.__class__.__name__
 
         acc += f"({self.children[0]}"
@@ -51,10 +53,10 @@ class ASTNode:
 
         return acc + ")"
 
-    def alternative_to_string(self):
-        global_vars.show_node = False
-        tmp = self.to_string()
+    def to_string_show_node(self):
         global_vars.show_node = True
+        tmp = self.to_string()
+        global_vars.show_node = False
         return tmp
 
 

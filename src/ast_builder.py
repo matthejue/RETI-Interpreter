@@ -47,27 +47,18 @@ class ASTBuilder:
 
     def save(self, fname):
         """Save a node"""
-        if global_vars.is_tasting:
-            return
-
         if not self.return_nodes.get(fname):
             self.return_nodes[fname] = [self.current_node]
         else:
             self.return_nodes[fname] += [self.current_node]
 
     def go_back(self, fname):
-        if global_vars.is_tasting:
-            return
-
         return_node = self.return_nodes[fname].pop()
         return_node.children.pop()
         return_node.children += self.current_node.children
         self.current_node = return_node
 
     def discard(self, fname):
-        if global_vars.is_tasting:
-            return
-
         self.return_nodes[fname].pop()
 
     def __repr__(

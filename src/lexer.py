@@ -175,8 +175,7 @@ class Lexer:
                 # :grammar:
                 self.next_char()
                 word = self.c
-                # 1 and 2 are because of IN1 and IN2
-                while self.lc in self.LETTER + "12":
+                while self.lc in self.LETTER + self.DIGIT_WITH_ZERO + "_":
                     self.next_char()
                     word += self.c
                 if word in REGISTER:
