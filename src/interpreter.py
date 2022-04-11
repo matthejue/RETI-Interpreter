@@ -141,7 +141,6 @@ class Interpreter(cmd2.Cmd):
     @cmd2.with_argparser(cli_args_parser)
     def do_interpret(self, args):
         code = args.infile
-        # don't change anything about the color setting
         color = global_vars.args.color
         global_vars.args = args
         global_vars.args.infile = "stdin"
@@ -152,9 +151,8 @@ class Interpreter(cmd2.Cmd):
         # printing is always on in shell
         global_vars.args.print = True
 
-        # infile attribute is used as storage for the code
         try:
-            self._interpret((f"stdin \n{code}\n JUMP 0;").split("\n"))
+            self._interpret(code.split("\n") + ["JUMP 0;"])
         except Exception as e:
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
@@ -176,7 +174,7 @@ class Interpreter(cmd2.Cmd):
         with open(global_vars.args.infile, encoding="utf-8") as fin:
             pico_c_in = fin.readlines()
 
-        self._interpret([basename(global_vars.args.infile) + " "] + pico_c_in)
+        self._interpret(pico_c_in)
 
     #  def _reset(self, fname, finput):
     #      # Singletons have to be reset manually for the shell
@@ -191,7 +189,7 @@ class Interpreter(cmd2.Cmd):
             __import__("pudb").set_trace()
 
         # remove all empty lines and \n from the code lines in the list
-        code_without_cr = list(
+        code_without_cr = [basename(global_vars.args.infile)] + list(
             filter(lambda line: line, map(lambda line: line.upper().strip("\n"), code))
         )
         # reset everything to defaults
