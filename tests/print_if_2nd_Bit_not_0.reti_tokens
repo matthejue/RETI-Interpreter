@@ -1,1 +1,0 @@
-['PRINT_IF_2ND_BIT_NOT_0', 'CALL', 'INPUT', ';', 'DIVI', 'ACC', '2', ';', 'MULTI', 'ACC', '2097152', ';', 'MULTI', 'ACC', '1024', ';', 'JUMP', '=', '3', ';', 'LOADI', 'ACC', '42', ';', 'CALL', 'PRINT', ';', 'JUMP', '0', ';']

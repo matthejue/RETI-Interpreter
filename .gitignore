@@ -9,3 +9,7 @@ output.csv
 input.csv
 pico_c_compiler.spec
 README.txt
+*.out
+*.reti_ast
+*.reti_state
+*.reti_tokens
