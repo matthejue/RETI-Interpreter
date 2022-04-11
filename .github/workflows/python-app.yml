@@ -30,7 +30,7 @@ jobs:
     - name: Test with Shellscript
       run: |
         #  make file runnable, might not be necessary
-        chmod +x "${GITHUB_WORKSPACE}/.github/run_tests.sh"
+        chmod +x "${GITHUB_WORKSPACE}/run_tests.sh"
 
         # run script
-        "${GITHUB_WORKSPACE}/.github/run_tests.sh"
+        "${GITHUB_WORKSPACE}/run_tests.sh"
