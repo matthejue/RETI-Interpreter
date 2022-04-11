@@ -22,3 +22,7 @@ echo Running through: $(($num_tests-${#not_running_through[@]})) / $num_tests;
 echo Passed: $(($num_tests-${#not_passed[@]})) / $num_tests;
 echo Not running through tests: ${not_running_through[*]};
 echo Not passed tests: ${not_passed[*]};
+
+if [[ ${#not_passed[@]} != 0 ]]; then
+    exit 1
+fi
