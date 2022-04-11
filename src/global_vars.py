@@ -17,7 +17,7 @@ class Args:
         self.color = True
         self.verbose = False
         self.debug = False
-        self.show_error_messages = False
+        self.show_error_message = False
 
 
 # options from command-line arguments

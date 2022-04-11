@@ -21,7 +21,7 @@ class Interpreter(cmd2.Cmd):
     cli_args_parser.add_argument("infile", nargs="?")
     cli_args_parser.add_argument("-c", "--concrete_syntax", action="store_true")
     cli_args_parser.add_argument("-t", "--tokens", action="store_true")
-    cli_args_parser.add_argument("-a", "--abstract-syntax", action="store_true")
+    cli_args_parser.add_argument("-a", "--abstract_syntax", action="store_true")
     cli_args_parser.add_argument("-o", "--print_output", action="store_true")
     cli_args_parser.add_argument("-r", "--reti_state", action="store_true")
     cli_args_parser.add_argument("-p", "--print", action="store_true")
@@ -35,7 +35,7 @@ class Interpreter(cmd2.Cmd):
     cli_args_parser.add_argument("-C", "--color", action="store_true")
     cli_args_parser.add_argument("-v", "--verbose", action="store_true")
     cli_args_parser.add_argument("-g", "--debug", action="store_true")
-    cli_args_parser.add_argument("-m", "--show_error_messages", action="store_true")
+    cli_args_parser.add_argument("-m", "--show_error_message", action="store_true")
 
     HISTORY_FILE = os.path.expanduser("~") + "/.config/reti_interpreter/history.json"
     SETTINGS_FILE = os.path.expanduser("~") + "/.config/reti_interpreter/settings.conf"
@@ -159,7 +159,7 @@ class Interpreter(cmd2.Cmd):
             print(
                 f"{CM().BRIGHT}{CM().WHITE}Compilation unsuccessfull{CM().RESET}{CM().RESET_ALL}\n"
             )
-            if global_vars.args.show_error_messages:
+            if global_vars.args.show_error_message:
                 raise e
         else:
             print(

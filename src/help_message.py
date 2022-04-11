@@ -34,7 +34,7 @@ def generate_help_message():
         strip_multiline_string(
             f"""
     {header("Synopsis", terminal_width, '=')}
-    Usage: reti_interpreter / interpret [-h] [-c] [-t] [-a] [-o] [-r][-p] [-b PROCESS_BEGIN] [-d DATA_SEGMENT_SIZE] [-D DISTANCE] [-v] [-S SIGHT] [-C] [-g] [-m] [infile]
+    Usage: reti_interpreter / interpret [-h] [-c] [-t] [-a] [-o] [-r][-p] [-b PROCESS_BEGIN] [-d DATA_SEGMENT_SIZE] [-D DISTANCE] [-S SIGHT] [-C] [-v] [-g] [-m] [infile]
 
     Interprets RETI Code.
 
@@ -46,7 +46,7 @@ def generate_help_message():
     -c, --concrete_syntax
     >                     also print the concrete syntax (content of input file). Only works if --print option is active
     -t, --tokens          also write the tokenlist
-    -a, --abstract-syntax
+    -a, --abstract_syntax
     >                     also write the abstract syntax
     -o, --print-output
     >                     also write the output from the print call
@@ -59,12 +59,12 @@ def generate_help_message():
     >                     default size for the datasegment (default size `32`)
     -D, --distance DISTANCE
     >                     distance of the comments from the instructions for the --verbose option. The passed value gets added to the minimum distance of 2 spaces
-    -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
     -S, --sight SIGHT     sets the number of lines visible around a error message
     -C, --color           colorizes the terminal output. Gets ignored in the shell. Instead in the shell colors can be toggled via the `color_toggle` command (shortcut `ct`)
+    -v, --verbose         also show tokentype and position for tokens, write the nodetype in front of parenthesis in the abstract syntax tree, add comments to the RETI Code
     -g, --debug           starts the debugger in the code
-    -m, --show_error_messages
-    >                     show error messages from python
+    -m, --show_error_message
+    >                     show error message from python
 
     {header("RETI Assembler", terminal_width, '=')}
     RETI Assembler is a minimalistic Asssembler language.
@@ -86,7 +86,7 @@ def generate_help_message():
     If you don't want to type the most likely used cli options out every time, you can use the `most_used "<code>";` command (shortcut `mu`).
     It's a shortcut for:
 
-    `interpret -c -t -a -o -r -p -v -b 8 -d 0 -D 20 -S 2 -m "<code>";`
+    `interpret -ctaor -p -v -b 8 -d 0 -D 20 -S 2 -m "<code>";`
 
     and shrinks it down to:
 
