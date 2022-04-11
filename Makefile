@@ -8,15 +8,15 @@ install:
 
 read: _read clean
 _read:
-	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m ./run/code.reti
+	./src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -m ./run/code.reti
 
 read-verbose: _read-verbose clean
 _read-verbose:
-	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -v -m ./run/code.reti
+	./src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -v -m ./run/code.reti
 
 read-color: _read-color clean
 _read-color:
-	./src/main.py -c -t -a -o -r -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m ./run/code.reti
+	./src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m ./run/code.reti
 
 shell: _shell clean
 _shell:
