@@ -97,3 +97,15 @@ class Errors:
             self.found_symbol_type = found_symbol_type
             self.found_from = found_from
             self.found_to = found_to
+
+    class JumpedOutOfProgramError(Exception):
+        """If the PC Register points outside of any instruction of the program,
+        probably because a 'JUMP 0' was forgotten to terminate execution"""
+
+        def __init__(self, found, found_pos, found_symbol_type, found_from, found_to):
+            self.description = f"{CM().YELLOW}JumpedOutOfProgramError{CM().RESET}: Literal '{found}' is too large"
+            self.found = found
+            self.found_pos = found_pos
+            self.found_symbol_type = found_symbol_type
+            self.found_from = found_from
+            self.found_to = found_to

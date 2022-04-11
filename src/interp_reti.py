@@ -3,6 +3,7 @@ from reti import RETI
 import global_vars
 import os
 from instruction_grammar import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
+from errors import Errors
 
 
 class Interp_RETI:
@@ -59,11 +60,11 @@ class Interp_RETI:
                 memory_type = destination >> 30
                 match memory_type:
                     case 0b00:
-                        reti.eprom[destination << 2 >> 2] = source
+                        reti.eprom[((destination << 2) % 2**32) >> 2] = source
                     case 0b01:
-                        reti.uart[destination << 2 >> 2] = source
+                        reti.uart[((destination << 2) % 2**32) >> 2] = source
                     case _:
-                        reti.sram[destination << 2 >> 2] = source
+                        reti.sram[((destination << 2) % 2**32) >> 2] = source
 
     def interp_memory_load(self, source, reti) -> int:
         match source:
@@ -170,9 +171,7 @@ class Interp_RETI:
                 self.interp_memory_store(
                     (abs(self.interp_memory_load(destination, reti)) + int(val))
                     % 2**32,
-                    self.interp_memory_load(
-                        self.interp_memory_load(reg_source, reti), reti
-                    ),
+                    self.interp_memory_load(reg_source, reti),
                     reti,
                 )
                 reti.registers["PC"] += 1
@@ -237,7 +236,7 @@ class Interp_RETI:
                             with open(
                                 global_vars.outbase + ".out", "a", encoding="utf-8"
                             ) as fout:
-                                fout.write("\n" + str(reti.registers["ACC"]))
+                                fout.write(" " + str(reti.registers["ACC"]))
                 reti.registers["PC"] += 1
             case NT.Call(NT.Name("INPUT")):
                 if global_vars.test_input:
@@ -248,16 +247,17 @@ class Interp_RETI:
 
     def preconfigs(self, p, reti):
         # set the CS, PC, DS and SP Register properly
-        reti.registers["CS"] = global_vars.args.process_begin
+        reti.registers["CS"] = global_vars.args.process_begin + 2**31
         reti.registers["PC"] = global_vars.args.process_begin + 2**31
         reti.registers["DS"] = (
             global_vars.args.process_begin + len(p.children) + 2**31
         )
         reti.registers["SP"] = (
             global_vars.args.process_begin
-            + len(p.children)
+            + len(p.instructions)
             + global_vars.args.datasegment_size
             + 2**31
+            - 1
         )
         if os.path.isfile(global_vars.outbase + ".in"):
             with open(global_vars.outbase + ".in", "r", encoding="utf-8") as fin:
@@ -273,9 +273,13 @@ class Interp_RETI:
         match p:
             case NT.Program(_, instructions):
                 while True:
-                    next_instruction = instructions[
-                        reti.registers["PC"] - global_vars.args.process_begin - 2**31
-                    ]
+                    i = reti.registers["PC"] - global_vars.args.process_begin - 2**31
+                    next_instruction = (
+                        instructions[i] if i < len(instructions) and i >= 0 else None
+                    )
+                    if not next_instruction:
+                        break
+                        # raise Errors.JumpedOutOfProgrammError()
                     match next_instruction:
                         case NT.Jump(NT.Always(), NT.Immediate("0")):
                             if (

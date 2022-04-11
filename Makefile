@@ -1,7 +1,7 @@
 ARG_BASE = $(shell basename --suffix=.reti $(ARG))
 .PHONY: all test clean
 
-all: read-all-color
+all: read-color
 
 install:
 	ln -sr ./src/main.py /usr/local/bin/reti_interpreter
@@ -29,7 +29,7 @@ test: _test clean
 test-extract: extract _test clean
 _test:
 	# start with 'make test-arg ARG=file_basename'
-	# ARG2=-g if for debugging
+	# ARG2=-g for debugging
 	./run_tests.sh $(ARG_BASE) $(ARG2)
 
 help:

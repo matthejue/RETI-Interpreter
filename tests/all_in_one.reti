@@ -1,13 +1,13 @@
-# in:7 2 3
-# except:32142
+# in:3 2 6 14
+# except:6 18 36 50 44 42 42
 call input;
 # put acc in in1 directly
 move acc in1;
 call input;
 # put acc in in2 over stack
-storein sp acc 1;
+storein sp acc 0;
 subi sp 1;
-loadin sp in2 0;
+loadin sp in2 1;
 addi sp 1;
 call input;
 call print;
@@ -15,3 +15,20 @@ mult acc in1;
 call print;
 mult acc in2;
 call print;
+# store acc to use it later with compute memory
+store acc 8;
+call input;
+add acc 8;
+call print;
+# compute immediate
+subi acc 6;
+call print;
+# load immediate
+loadi in1 2;
+sub acc in1;
+call print;
+# load memory
+load acc 8;
+addi acc 6;
+call print;
+jump 0;
