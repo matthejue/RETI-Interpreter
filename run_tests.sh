@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+./extract_input_and_except.sh
+
 num_tests=0;
 not_running_through=();
 not_passed=();
@@ -7,7 +9,7 @@ not_passed=();
     echo -e "\n\033[1;37m===============================================================================";
     echo $test;
     echo -e "===============================================================================\033[0;0m";
-    ./src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -v -m $2 $test
+    ./src/main.py -ctaor -p -b 8 -d 32 -D 20 -s 2 -E 8 -U 4 -S 0 -C -m $2 $test
 
     if [[ $? != 0 ]]; then
       not_running_through+=($test);
