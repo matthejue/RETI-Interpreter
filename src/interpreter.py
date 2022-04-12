@@ -189,7 +189,7 @@ class Interpreter(cmd2.Cmd):
             __import__("pudb").set_trace()
 
         # remove all empty lines and \n from the code lines in the list
-        code_without_cr = [basename(global_vars.args.infile)] + list(
+        code_without_cr = [f"{basename(global_vars.args.infile)} "] + list(
             filter(lambda line: line, map(lambda line: line.upper().strip("\n"), code))
         )
         # reset everything to defaults
