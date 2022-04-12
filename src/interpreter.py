@@ -222,7 +222,7 @@ class Interpreter(cmd2.Cmd):
 
         abstract_syntax_tree = grammar.reveal_ast()
         #  error_handler.handle(abstract_syntax_tree.interp)
-        Interp_RETI().interp_program(abstract_syntax_tree)
+        Interp_RETI().interp_reti(abstract_syntax_tree)
 
         #  # show warnings before reti code gets output
         #  warning_handler.show_warnings()

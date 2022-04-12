@@ -12,13 +12,13 @@ class Interp_RETI:
     first_write_out = True
     first_write_reti_state = True
 
-    def interp_jump_condition(self, condition, jumplength, reti):
+    def _jump_condition(self, condition, jumplength, reti):
         if condition:
             reti.registers["PC"] += jumplength
         else:
             reti.registers["PC"] += 1
 
-    def interp_operation(self, operand1, operation, operand2):
+    def _op(self, operand1, operation, operand2):
         match operation:
             case (NT.Add() | NT.Addi()):
                 # sigextension
@@ -39,7 +39,7 @@ class Interp_RETI:
             case (NT.And() | NT.Andi()):
                 return (operand1 & operand2) % 2**32
 
-    def interp_memory_store(self, destination, source, reti) -> int:
+    def _memory_store(self, destination, source, reti) -> int:
         match destination:
             # addressbus
             case NT.Immediate(val):
@@ -66,7 +66,7 @@ class Interp_RETI:
                     case _:
                         reti.sram[((destination << 2) % 2**32) >> 2] = source
 
-    def interp_memory_load(self, source, reti) -> int:
+    def _memory_load(self, source, reti) -> int:
         match source:
             # addressbus
             case NT.Immediate(val):
@@ -95,7 +95,7 @@ class Interp_RETI:
                 #  raise TODO: sich hier was überlegen
                 ...
 
-    def interp_instruction(self, instr, reti):
+    def _instr(self, instr, reti):
         match instr:
             case NT.Programname():
                 reti.registers["PC"] += 1
@@ -104,12 +104,12 @@ class Interp_RETI:
                 NT.Reg() as destination,
                 (NT.Immediate() | NT.Reg()) as source,
             ) if type(operation) in COMPUTE_INSTRUCTION.values():
-                self.interp_memory_store(
+                self._memory_store(
                     destination,
-                    self.interp_operation(
-                        self.interp_memory_load(destination, reti),
+                    self._op(
+                        self._memory_load(destination, reti),
                         operation,
-                        self.interp_memory_load(source, reti),
+                        self._memory_load(source, reti),
                     ),
                     reti,
                 )
@@ -118,18 +118,14 @@ class Interp_RETI:
                 operation, NT.Reg() as destination, NT.Immediate(val)
             ) if type(operation) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
                 # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
-                self.interp_memory_store(
+                self._memory_store(
                     destination,
-                    self.interp_operation(
-                        self.interp_memory_load(destination, reti), operation, int(val)
-                    ),
+                    self._op(self._memory_load(destination, reti), operation, int(val)),
                     reti,
                 )
                 reti.registers["PC"] += 1
             case NT.Instr(NT.Load(), NT.Reg() as destination, NT.Immediate() as source):
-                self.interp_memory_store(
-                    destination, self.interp_memory_load(source, reti), reti
-                )
+                self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case NT.Instr(
                 NT.Loadin(),
@@ -137,11 +133,10 @@ class Interp_RETI:
                 NT.Reg() as destination,
                 NT.Immediate(val),
             ):
-                self.interp_memory_store(
+                self._memory_store(
                     destination,
-                    self.interp_memory_load(
-                        (abs(self.interp_memory_load(reg_source, reti)) + int(val))
-                        % 2**32,
+                    self._memory_load(
+                        (abs(self._memory_load(reg_source, reti)) + int(val)) % 2**32,
                         reti,
                     ),
                     reti,
@@ -149,7 +144,7 @@ class Interp_RETI:
                 reti.registers["PC"] += 1
             case NT.Instr(NT.Loadi(), NT.Reg() as destination, NT.Immediate(val)):
                 # TODO: Signextension?
-                self.interp_memory_store(
+                self._memory_store(
                     destination,
                     int(val),
                     reti,
@@ -158,9 +153,7 @@ class Interp_RETI:
             case NT.Instr(
                 NT.Store(), NT.Reg() as source, NT.Immediate() as destination
             ):
-                self.interp_memory_store(
-                    destination, self.interp_memory_load(source, reti), reti
-                )
+                self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case NT.Instr(
                 NT.Storein(),
@@ -168,48 +161,33 @@ class Interp_RETI:
                 NT.Reg() as reg_source,
                 NT.Immediate(val),
             ):
-                self.interp_memory_store(
-                    (abs(self.interp_memory_load(destination, reti)) + int(val))
-                    % 2**32,
-                    self.interp_memory_load(reg_source, reti),
+                self._memory_store(
+                    (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
+                    self._memory_load(reg_source, reti),
                     reti,
                 )
                 reti.registers["PC"] += 1
             case NT.Instr(NT.Move(), NT.Reg() as source, NT.Reg() as destination):
-                self.interp_memory_store(
-                    destination, self.interp_memory_load(source, reti), reti
-                )
+                self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case NT.Jump(relation, NT.Immediate(val)):
                 match relation:
                     case NT.Lt():
-                        self.interp_jump_condition(
-                            0 < reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 < reti.registers["ACC"], int(val), reti)
                     case NT.Lte():
-                        self.interp_jump_condition(
-                            0 <= reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 <= reti.registers["ACC"], int(val), reti)
                     case NT.Gt():
-                        self.interp_jump_condition(
-                            0 > reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 > reti.registers["ACC"], int(val), reti)
                     case NT.Gte():
-                        self.interp_jump_condition(
-                            0 >= reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 >= reti.registers["ACC"], int(val), reti)
                     case (NT.Eq()):
-                        self.interp_jump_condition(
-                            0 == reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 == reti.registers["ACC"], int(val), reti)
                     case (NT.Neq()):
-                        self.interp_jump_condition(
-                            0 != reti.registers["ACC"], int(val), reti
-                        )
+                        self._jump_condition(0 != reti.registers["ACC"], int(val), reti)
                     case (NT.Always()):
-                        self.interp_jump_condition(True, int(val), reti)
+                        self._jump_condition(True, int(val), reti)
                     case (NT.Nop()):
-                        self.interp_jump_condition(False, int(val), reti)
+                        self._jump_condition(False, int(val), reti)
             case NT.Int(NT.Immediate(val)):
                 # save PC to stack
                 reti.sram[reti.registers["SP"]] = reti.registers["PC"]
@@ -245,7 +223,7 @@ class Interp_RETI:
                     reti.registers["ACC"] = int(input())
                 reti.registers["PC"] += 1
 
-    def preconfigs(self, p, reti):
+    def _preconfigs(self, p, reti):
         # set the CS, PC, DS and SP Register properly
         reti.registers["CS"] = global_vars.args.process_begin + 2**31
         reti.registers["PC"] = global_vars.args.process_begin + 2**31
@@ -264,40 +242,6 @@ class Interp_RETI:
                 global_vars.test_input = list(
                     reversed([int(line) for line in fin.readline().split(" ")])
                 )
-
-    def interp_program(self, p: NT.Program):
-        # necessary for the __match_case__ of the nodes to work
-        p.update_match_args()
-        reti = RETI(p.instructions)
-        self.preconfigs(p, reti)
-        match p:
-            case NT.Program(_, instructions):
-                while True:
-                    i = reti.registers["PC"] - global_vars.args.process_begin - 2**31
-                    next_instruction = (
-                        instructions[i] if i < len(instructions) and i >= 0 else None
-                    )
-                    if not next_instruction:
-                        break
-                        # raise Errors.JumpedOutOfProgrammError()
-                    match next_instruction:
-                        case NT.Jump(NT.Always(), NT.Immediate("0")):
-                            if (
-                                global_vars.args.reti_state
-                                and not global_vars.args.verbose
-                            ):
-                                self._reti_state_option(reti)
-                            # needs a newline at the end, else it differs from .out_except
-                            with open(
-                                global_vars.outbase + ".out", "a", encoding="utf-8"
-                            ) as fout:
-                                fout.write("\n")
-                            break
-
-                        case _:
-                            self.interp_instruction(next_instruction, reti)
-                    if global_vars.args.reti_state and global_vars.args.verbose:
-                        self._reti_state_option(reti)
 
     def _reti_state_option(self, reti_state):
         if global_vars.args.print:
@@ -325,3 +269,40 @@ class Interp_RETI:
                     encoding="utf-8",
                 ) as fout:
                     fout.write("\n\n" + str(reti_state))
+
+    def _program(self, p: NT.Program, reti):
+        match p:
+            case NT.Program(_, instructions):
+                while True:
+                    i = reti.registers["PC"] - global_vars.args.process_begin - 2**31
+                    next_instruction = (
+                        instructions[i] if i < len(instructions) and i >= 0 else None
+                    )
+                    if not next_instruction:
+                        break
+                        # raise Errors.JumpedOutOfProgrammError()
+                    match next_instruction:
+                        case NT.Jump(NT.Always(), NT.Immediate("0")):
+                            if (
+                                global_vars.args.reti_state
+                                and not global_vars.args.verbose
+                            ):
+                                self._reti_state_option(reti)
+                            # needs a newline at the end, else it differs from .out_except
+                            with open(
+                                global_vars.outbase + ".out", "a", encoding="utf-8"
+                            ) as fout:
+                                fout.write("\n")
+                            break
+
+                        case _:
+                            self._instr(next_instruction, reti)
+                    if global_vars.args.reti_state and global_vars.args.verbose:
+                        self._reti_state_option(reti)
+
+    def interp_reti(self, p: NT.Program):
+        # necessary for the __match_case__ of the nodes to work
+        p.update_match_args()
+        reti = RETI(p.instructions)
+        self._preconfigs(p, reti)
+        self._program(p, reti)

@@ -14,7 +14,7 @@ class Grammar(InstructionGrammar):
 
         :returns: None
         """
-        self.parse_program()
+        self._program()
         self.match([TT.EOF])
 
     def reveal_ast(self):
