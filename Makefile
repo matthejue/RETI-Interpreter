@@ -26,7 +26,7 @@ extract:
 	./extract_input_and_except.sh
 
 test: _test clean
-test-extract: extract _test clean
+test-clean-all: _test clean-all
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-g for debugging
