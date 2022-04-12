@@ -1,4 +1,4 @@
-from parse_instruction import InstructionGrammar
+from parse_reti import InstructionGrammar
 from lexer import TT
 
 
@@ -14,7 +14,7 @@ class Grammar(InstructionGrammar):
 
         :returns: None
         """
-        self.code_instr()
+        self.parse_program()
         self.match([TT.EOF])
 
     def reveal_ast(self):

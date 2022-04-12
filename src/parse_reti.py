@@ -54,7 +54,7 @@ OTHER_INSTRUCTION = {
 
 
 class InstructionGrammar(LL_Recursive_Decent_Parser):
-    def _instr(self):
+    def parse_instr(self):
         """instruction"""
         if self.LTT(1) in COMPUTE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_INSTRUCTION> <REGISTER> (<REGISTER>|<Immediate>)
@@ -205,7 +205,7 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
             # error
             pass
 
-    def code_instr(self):
+    def parse_program(self):
         savestate_node = self.ast_builder.down(NT.Program)
 
         self.add_and_match([TT.NAME], classname=NT.Programname)
@@ -215,6 +215,6 @@ class InstructionGrammar(LL_Recursive_Decent_Parser):
             COMPUTE_IMMEDIATE_INSTRUCTION.keys(),
             OTHER_INSTRUCTION,
         ):
-            self._instr()
+            self.parse_instr()
 
         self.ast_builder.up(savestate_node)
