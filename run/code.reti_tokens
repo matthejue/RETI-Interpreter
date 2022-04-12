@@ -1,1 +1,0 @@
-['CODE', 'CALL', 'INPUT', ';', 'MOVE', 'ACC', 'IN1', ';', 'CALL', 'INPUT', ';', 'ADD', 'ACC', 'IN1', ';', 'CALL', 'PRINT', ';', 'JUMP', '0', ';']

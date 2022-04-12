@@ -1,5 +1,5 @@
 # in:3 2 6 14
-# except:6 18 36 50 44 42 42
+# expected:6 18 36 50 44 42 42
 call input;
 # put acc in in1 directly
 move acc in1;

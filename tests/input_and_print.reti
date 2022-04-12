@@ -1,5 +1,5 @@
 # in:12 30
-# except:42
+# expected:42
 
 # let's a go
 call input;

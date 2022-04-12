@@ -40,6 +40,14 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 
+clean-all:
+	find . -type f -name "*.reti_tokens" -delete
+	find . -type f -name "*.reti_ast" -delete
+	find . -type f -name "*.in" -delete
+	find . -type f -name "*.out" -delete
+	find . -type f -name "*.out_expected" -delete
+	find . -type f -name "*.reti_state" -delete
+
 setup_pyinstaller_linux:
 	python -m pip install --upgrade pip
 	pip install tabulate

@@ -8,5 +8,7 @@ pico_c_compiler.spec
 README.txt
 *.reti_tokens
 *.reti_ast
+*.in
 *.out
+*.out_expected
 *.reti_state

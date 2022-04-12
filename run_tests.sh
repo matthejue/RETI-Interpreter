@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-./extract_input_and_except.sh
+./extract_input_and_expected.sh
 
 num_tests=0;
 not_running_through=();
@@ -15,7 +15,7 @@ not_passed=();
       not_running_through+=($test);
     fi;
 
-    diff ./${test%.reti}.out_except ./${test%.reti}.out
+    diff ./${test%.reti}.out_expected ./${test%.reti}.out
     if [[ $? != 0 ]]; then
       not_passed+=($test);
     fi

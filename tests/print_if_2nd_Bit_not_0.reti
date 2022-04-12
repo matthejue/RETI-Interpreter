@@ -1,5 +1,5 @@
 # in:7
-# except:42
+# expected:42
 call input;
 divi acc 2;
 multi acc 2097152;
