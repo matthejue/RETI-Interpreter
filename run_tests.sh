@@ -15,7 +15,7 @@ not_passed=();
       not_running_through+=($test);
     fi;
 
-    diff ./${test%.reti}.out_expected ./${test%.reti}.out
+    diff ${test%.reti}.out_expected ${test%.reti}.out
     if [[ $? != 0 ]]; then
       not_passed+=($test);
     fi
