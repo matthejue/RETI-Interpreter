@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 for test in ./tests/*.reti; do
-  sed -n '1p' $test | sed -e 's/^# in://' > ./tests/$(basename --suffix=.reti $test).in
-  sed -n '2p' $test | sed -e 's/^# except://' > ./tests/$(basename --suffix=.reti $test).out_except
+  sed -n '1p' $test | sed -e 's/^# in://' > ./${test%.reti}.in
+  sed -n '2p' $test | sed -e 's/^# except://' > ./${test%.reti}.out_except
 done
