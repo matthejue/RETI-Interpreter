@@ -1,4 +1,4 @@
-from instruction_grammar import InstructionGrammar
+from parse_instruction import InstructionGrammar
 from lexer import TT
 
 

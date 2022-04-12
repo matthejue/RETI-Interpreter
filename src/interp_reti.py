@@ -2,7 +2,7 @@ from reti_ast import NT
 from reti import RETI
 import global_vars
 import os
-from instruction_grammar import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
+from parse_instruction import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
 from errors import Errors
 
 
