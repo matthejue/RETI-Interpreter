@@ -1,4 +1,4 @@
-from abstract_syntax_tree import ASTNode
+from ast_node import ASTNode
 
 
 class NT:

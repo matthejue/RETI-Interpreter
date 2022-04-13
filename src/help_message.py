@@ -1,6 +1,6 @@
 import os
 import global_vars
-from abstract_syntax_tree import strip_multiline_string
+from ast_node import strip_multiline_string
 from colorizer import colorize_help_page
 
 

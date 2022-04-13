@@ -42,7 +42,7 @@ clean:
 
 clean-all:
 	find . -type f -name "*.reti_tokens" -delete
-	find . -type f -name "*.reti_ast" -delete
+	find . -type f -name "*.reti_nodes" -delete
 	find . -type f -name "*.in" -delete
 	find . -type f -name "*.out" -delete
 	find . -type f -name "*.out_expected" -delete

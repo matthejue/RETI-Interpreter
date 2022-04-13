@@ -1,8 +1,8 @@
 import global_vars
 import cmd2
 from lexer import Lexer, TT
-from grammar import Grammar
-from interp_reti import Interp_RETI
+from parse_reti import RETIParser
+from interp_reti import RETIInterpreter
 
 #  from error_handler import ErrorHandler
 #  from warning_handler import WarningHandler
@@ -213,16 +213,16 @@ class Interpreter(cmd2.Cmd):
             lexer.__init__(code_without_cr)
 
         # Generate ast
-        grammar = Grammar(lexer)
+        grammar = RETIParser(lexer)
         #  error_handler.handle(grammar.start_parse)
-        grammar.start_parse()
+        grammar.parse_reti()
 
         if global_vars.args.abstract_syntax:
             self._abstract_syntax_option(grammar)
 
-        abstract_syntax_tree = grammar.reveal_ast()
-        #  error_handler.handle(abstract_syntax_tree.interp)
-        Interp_RETI().interp_reti(abstract_syntax_tree)
+        ast_node = grammar.reveal_ast()
+        #  error_handler.handle(ast_node.interp)
+        RETIInterpreter().interp_reti(ast_node)
 
         #  # show warnings before reti code gets output
         #  warning_handler.show_warnings()
@@ -245,14 +245,16 @@ class Interpreter(cmd2.Cmd):
             ) as fout:
                 fout.write(str(tokens))
 
-    def _abstract_syntax_option(self, grammar: Grammar):
+    def _abstract_syntax_option(self, grammar: RETIParser):
         if global_vars.args.print:
             ast = str(grammar.reveal_ast())
             #  ast = Colorizer(ast).colorize_abstract_syntax()
             print("\n" + ast)
 
         if global_vars.outbase:
-            with open(global_vars.outbase + ".reti_ast", "w", encoding="utf-8") as fout:
+            with open(
+                global_vars.outbase + ".reti_nodes", "w", encoding="utf-8"
+            ) as fout:
                 fout.write(str(grammar.reveal_ast()))
 
 

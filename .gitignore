@@ -7,7 +7,7 @@ build/
 pico_c_compiler.spec
 README.txt
 *.reti_tokens
-*.reti_ast
+*.reti_nodes
 *.in
 *.out
 *.out_expected

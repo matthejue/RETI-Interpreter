@@ -1,12 +1,12 @@
-from reti_ast import NT
+from reti_nodes import NT
 from reti import RETI
 import global_vars
 import os
-from parse_reti import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
+from parse_instrs import COMPUTE_IMMEDIATE_INSTRUCTION, COMPUTE_INSTRUCTION
 from errors import Errors
 
 
-class Interp_RETI:
+class RETIInterpreter:
     # when the <outabse>.out file gets written for the first time it should
     # overwrite everything else
     first_write_out = True
@@ -247,10 +247,10 @@ class Interp_RETI:
         if global_vars.args.print:
             #  code = (
             #      Colorizer(
-            #          str(abstract_syntax_tree.show_generated_code())
+            #          str(ast_node.show_generated_code())
             #      ).colorize_reti_code()
             #      if global_vars.args.color
-            #      else str(abstract_syntax_tree.show_generated_code())
+            #      else str(ast_node.show_generated_code())
             #  )
             print("\n" + str(reti_state))
         if global_vars.outbase:
@@ -270,7 +270,7 @@ class Interp_RETI:
                 ) as fout:
                     fout.write("\n\n" + str(reti_state))
 
-    def _program(self, p: NT.Program, reti):
+    def _instrs(self, p: NT.Program, reti):
         match p:
             case NT.Program(_, instructions):
                 while True:
@@ -305,4 +305,4 @@ class Interp_RETI:
         p.update_match_args()
         reti = RETI(p.instructions)
         self._preconfigs(p, reti)
-        self._program(p, reti)
+        self._instrs(p, reti)
