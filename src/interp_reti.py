@@ -97,8 +97,6 @@ class RETIInterpreter:
 
     def _instr(self, instr, reti):
         match instr:
-            case NT.Programname():
-                reti.registers["PC"] += 1
             case NT.Instr(
                 operation,
                 NT.Reg() as destination,
