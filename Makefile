@@ -26,7 +26,7 @@ extract:
 	./extract_input_and_except.sh
 
 test: _test clean
-test-clean-all: _test clean-all
+test-clean-all: _test clean clean-files
 _test:
 	# start with 'make test-arg ARG=file_basename'
 	# ARG2=-g for debugging
@@ -40,7 +40,7 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 
-clean-all:
+clean-files:
 	find . -type f -name "*.reti_tokens" -delete
 	find . -type f -name "*.reti_nodes" -delete
 	find . -type f -name "*.in" -delete
