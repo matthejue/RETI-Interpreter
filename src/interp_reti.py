@@ -197,7 +197,7 @@ class RETIInterpreter:
                 reti.registers["PC"] = reti.sram[reti.registers["SP"] + 1]
                 # delete PC from stack
                 reti.registers["SP"] = reti.registers["SP"] + 1
-            case NT.Call(NT.Name("PRINT")):
+            case NT.Call(NT.Identifier("PRINT")):
                 if global_vars.args.print_output:
                     if global_vars.args.print:
                         print("\nOutput:\n\t" + str(reti.registers["ACC"]))
@@ -214,7 +214,7 @@ class RETIInterpreter:
                             ) as fout:
                                 fout.write(" " + str(reti.registers["ACC"]))
                 reti.registers["PC"] += 1
-            case NT.Call(NT.Name("INPUT")):
+            case NT.Call(NT.Identifier("INPUT")):
                 if global_vars.test_input:
                     reti.registers["ACC"] = global_vars.test_input.pop()
                 else:

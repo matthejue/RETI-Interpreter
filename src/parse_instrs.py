@@ -196,7 +196,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.consume_next_token()
 
-            self.add_and_match([TT.NAME], classname=NT.Name)
+            self.add_and_match([TT.NAME], classname=NT.Identifier)
 
             self.match([TT.SEMICOLON])
 
@@ -208,7 +208,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
     def _instrs(self):
         savestate_node = self.ast_builder.down(NT.Program)
 
-        self.add_and_match([TT.NAME], classname=NT.Name)
+        self.add_and_match([TT.NAME], classname=NT.Identifier)
 
         while self.LTT(1) in chain(
             COMPUTE_INSTRUCTION.keys(),

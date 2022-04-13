@@ -150,7 +150,7 @@ class NT:
         def __repr__(self):
             return self.to_string_show_node()
 
-    class Name(ASTNode):
+    class Identifier(ASTNode):
         pass
 
     class Reg(ASTNode):
