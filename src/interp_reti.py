@@ -12,9 +12,9 @@ class RETIInterpreter:
     first_write_out = True
     first_write_reti_state = True
 
-    def _jump_condition(self, condition, jumplength, reti):
+    def _jump_condition(self, condition, offset, reti):
         if condition:
-            reti.registers["PC"] += jumplength
+            reti.registers["PC"] += offset
         else:
             reti.registers["PC"] += 1
 
@@ -170,19 +170,19 @@ class RETIInterpreter:
                 match relation:
                     case NT.Lt():
                         self._jump_condition(0 < reti.registers["ACC"], int(val), reti)
-                    case NT.Lte():
+                    case NT.LtE():
                         self._jump_condition(0 <= reti.registers["ACC"], int(val), reti)
                     case NT.Gt():
                         self._jump_condition(0 > reti.registers["ACC"], int(val), reti)
-                    case NT.Gte():
+                    case NT.GtE():
                         self._jump_condition(0 >= reti.registers["ACC"], int(val), reti)
                     case (NT.Eq()):
                         self._jump_condition(0 == reti.registers["ACC"], int(val), reti)
-                    case (NT.Neq()):
+                    case (NT.NEq()):
                         self._jump_condition(0 != reti.registers["ACC"], int(val), reti)
                     case (NT.Always()):
                         self._jump_condition(True, int(val), reti)
-                    case (NT.Nop()):
+                    case (NT.NOp()):
                         self._jump_condition(False, int(val), reti)
             case NT.Int(NT.Num(val)):
                 # save PC to stack

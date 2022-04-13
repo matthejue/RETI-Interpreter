@@ -108,25 +108,25 @@ class NT:
     class Lt(ASTNode):
         pass
 
-    class Lte(ASTNode):
+    class LtE(ASTNode):
         pass
 
     class Gt(ASTNode):
         pass
 
-    class Gte(ASTNode):
+    class GtE(ASTNode):
         pass
 
     class Eq(ASTNode):
         pass
 
-    class Neq(ASTNode):
+    class NEq(ASTNode):
         pass
 
     class Always(ASTNode):
         pass
 
-    class Nop(ASTNode):
+    class NOp(ASTNode):
         pass
 
     class Int(ASTNode):

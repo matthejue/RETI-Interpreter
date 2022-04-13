@@ -29,14 +29,14 @@ COMPUTE_IMMEDIATE_INSTRUCTION = {
 
 RELATION = {
     TT.LT: NT.Lt,
-    TT.LTE: NT.Lte,
+    TT.LTE: NT.LtE,
     TT.GT: NT.Gt,
-    TT.GTE: NT.Gte,
+    TT.GTE: NT.GtE,
     TT.EQ: NT.Eq,
     TT.EQ2: NT.Eq,
-    TT.NEQ: NT.Neq,
-    TT.NEQ2: NT.Neq,
-    TT.NOP: NT.Nop,
+    TT.NEQ: NT.NEq,
+    TT.NEQ2: NT.NEq,
+    TT.NOP: NT.NOp,
 }
 
 OTHER_INSTRUCTION = {
