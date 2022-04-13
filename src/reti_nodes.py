@@ -150,11 +150,13 @@ class NT:
         def __repr__(self):
             return self.to_string_show_node()
 
-    class Identifier(ASTNode):
+    class Name(ASTNode):
+        # shorter then 'Identifier'
         pass
 
     class Reg(ASTNode):
         pass
 
-    class Immediate(ASTNode):
+    class Num(ASTNode):
+        # shorter then 'Immediate'
         pass

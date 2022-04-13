@@ -67,7 +67,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             if self.LTT(1) == TT.REG:
                 self.add_and_consume(classname=NT.Reg)
             elif self.LTT(1) == TT.IMMEDIATE:
-                self.add_and_consume(classname=NT.Immediate)
+                self.add_and_consume(classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -80,7 +80,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -92,7 +92,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -106,7 +106,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -118,7 +118,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -130,7 +130,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -144,7 +144,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.REG], classname=NT.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -172,7 +172,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
                 savestate_node = self.ast_builder.down(NT.Always)
                 self.ast_builder.up(savestate_node)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -182,7 +182,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.consume_next_token()
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Immediate)
+            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
             self.match([TT.SEMICOLON])
 
@@ -196,7 +196,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.consume_next_token()
 
-            self.add_and_match([TT.NAME], classname=NT.Identifier)
+            self.add_and_match([TT.NAME], classname=NT.Name)
 
             self.match([TT.SEMICOLON])
 
@@ -208,7 +208,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
     def _instrs(self):
         savestate_node = self.ast_builder.down(NT.Program)
 
-        self.add_and_match([TT.NAME], classname=NT.Identifier)
+        self.add_and_match([TT.NAME], classname=NT.Name)
 
         while self.LTT(1) in chain(
             COMPUTE_INSTRUCTION.keys(),

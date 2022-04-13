@@ -42,7 +42,7 @@ class RETIInterpreter:
     def _memory_store(self, destination, source, reti) -> int:
         match destination:
             # addressbus
-            case NT.Immediate(val):
+            case NT.Num(val):
                 higher_bits = (reti.registers["DS"] >> 22) % 0b100000000 << 22
                 memory_type = reti.registers["DS"] >> 30
                 match memory_type:
@@ -69,7 +69,7 @@ class RETIInterpreter:
     def _memory_load(self, source, reti) -> int:
         match source:
             # addressbus
-            case NT.Immediate(val):
+            case NT.Num(val):
                 higher_bits = (reti.registers["DS"] >> 22) % 0b100000000 << 22
                 memory_type = reti.registers["DS"] >> 30
                 match memory_type:
@@ -100,7 +100,7 @@ class RETIInterpreter:
             case NT.Instr(
                 operation,
                 NT.Reg() as destination,
-                (NT.Immediate() | NT.Reg()) as source,
+                (NT.Num() | NT.Reg()) as source,
             ) if type(operation) in COMPUTE_INSTRUCTION.values():
                 self._memory_store(
                     destination,
@@ -112,9 +112,9 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(
-                operation, NT.Reg() as destination, NT.Immediate(val)
-            ) if type(operation) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
+            case NT.Instr(operation, NT.Reg() as destination, NT.Num(val)) if type(
+                operation
+            ) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
                 # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
                 self._memory_store(
                     destination,
@@ -122,14 +122,14 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Load(), NT.Reg() as destination, NT.Immediate() as source):
+            case NT.Instr(NT.Load(), NT.Reg() as destination, NT.Num() as source):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case NT.Instr(
                 NT.Loadin(),
                 NT.Reg() as reg_source,
                 NT.Reg() as destination,
-                NT.Immediate(val),
+                NT.Num(val),
             ):
                 self._memory_store(
                     destination,
@@ -140,7 +140,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Loadi(), NT.Reg() as destination, NT.Immediate(val)):
+            case NT.Instr(NT.Loadi(), NT.Reg() as destination, NT.Num(val)):
                 # TODO: Signextension?
                 self._memory_store(
                     destination,
@@ -148,16 +148,14 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(
-                NT.Store(), NT.Reg() as source, NT.Immediate() as destination
-            ):
+            case NT.Instr(NT.Store(), NT.Reg() as source, NT.Num() as destination):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case NT.Instr(
                 NT.Storein(),
                 NT.Reg() as destination,
                 NT.Reg() as reg_source,
-                NT.Immediate(val),
+                NT.Num(val),
             ):
                 self._memory_store(
                     (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
@@ -168,7 +166,7 @@ class RETIInterpreter:
             case NT.Instr(NT.Move(), NT.Reg() as source, NT.Reg() as destination):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
-            case NT.Jump(relation, NT.Immediate(val)):
+            case NT.Jump(relation, NT.Num(val)):
                 match relation:
                     case NT.Lt():
                         self._jump_condition(0 < reti.registers["ACC"], int(val), reti)
@@ -186,7 +184,7 @@ class RETIInterpreter:
                         self._jump_condition(True, int(val), reti)
                     case (NT.Nop()):
                         self._jump_condition(False, int(val), reti)
-            case NT.Int(NT.Immediate(val)):
+            case NT.Int(NT.Num(val)):
                 # save PC to stack
                 reti.sram[reti.registers["SP"]] = reti.registers["PC"]
                 reti.registers["SP"] = reti.registers["SP"] - 1
@@ -197,7 +195,7 @@ class RETIInterpreter:
                 reti.registers["PC"] = reti.sram[reti.registers["SP"] + 1]
                 # delete PC from stack
                 reti.registers["SP"] = reti.registers["SP"] + 1
-            case NT.Call(NT.Identifier("PRINT")):
+            case NT.Call(NT.Name("PRINT")):
                 if global_vars.args.print_output:
                     if global_vars.args.print:
                         print("\nOutput:\n\t" + str(reti.registers["ACC"]))
@@ -214,7 +212,7 @@ class RETIInterpreter:
                             ) as fout:
                                 fout.write(" " + str(reti.registers["ACC"]))
                 reti.registers["PC"] += 1
-            case NT.Call(NT.Identifier("INPUT")):
+            case NT.Call(NT.Name("INPUT")):
                 if global_vars.test_input:
                     reti.registers["ACC"] = global_vars.test_input.pop()
                 else:
@@ -280,7 +278,7 @@ class RETIInterpreter:
                         break
                         # raise Errors.JumpedOutOfProgrammError()
                     match next_instruction:
-                        case NT.Jump(NT.Always(), NT.Immediate("0")):
+                        case NT.Jump(NT.Always(), NT.Num("0")):
                             if (
                                 global_vars.args.reti_state
                                 and not global_vars.args.verbose
