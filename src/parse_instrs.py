@@ -69,8 +69,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             elif self.LTT(1) == TT.IMMEDIATE:
                 self.add_and_consume(classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) in COMPUTE_IMMEDIATE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_IMMEDIATE_INSTRUCTION> <REGISTER> <Immediate>
@@ -82,8 +80,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOAD:
             savestate_node = self.ast_builder.down(NT.Instr)
@@ -93,8 +89,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             self.add_and_match([TT.REG], classname=NT.Reg)
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
-
-            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADIN:
@@ -108,8 +102,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADI:
             savestate_node = self.ast_builder.down(NT.Instr)
@@ -120,8 +112,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STORE:
             savestate_node = self.ast_builder.down(NT.Instr)
@@ -131,8 +121,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             self.add_and_match([TT.REG], classname=NT.Reg)
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
-
-            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STOREIN:
@@ -146,8 +134,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.MOVE:
             savestate_node = self.ast_builder.down(NT.Instr)
@@ -157,8 +143,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             self.add_and_match([TT.REG], classname=NT.Reg)
 
             self.add_and_match([TT.REG], classname=NT.Reg)
-
-            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.JUMP:
@@ -174,8 +158,6 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.INT:
             savestate_node = self.ast_builder.down(NT.Int)
@@ -184,21 +166,15 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
 
-            self.match([TT.SEMICOLON])
-
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.RTI:
             self.add_and_consume(classname=NT.Rti)
-
-            self.match([TT.SEMICOLON])
         elif self.LTT(1) == TT.CALL:
             savestate_node = self.ast_builder.down(NT.Call)
 
             self.consume_next_token()
 
             self.add_and_match([TT.NAME], classname=NT.Name)
-
-            self.match([TT.SEMICOLON])
 
             self.ast_builder.up(savestate_node)
         else:
@@ -216,6 +192,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             OTHER_INSTRUCTION,
         ):
             self._instr()
+            self.match([TT.SEMICOLON])
 
         self.ast_builder.up(savestate_node)
 

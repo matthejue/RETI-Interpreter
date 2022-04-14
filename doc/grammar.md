@@ -2,8 +2,11 @@
 ## Concrete Syntax
 ### L_RETI
 ```
-name :=
-num :=
+dig_no_0 := 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+dig_with_0 := 0 | <dig_no_0>
+num := 0 | <dig_no_0><dig_with_0>* | -<dig_with_0>*
+letter := a | b | ... | y | z | A | B | ... | Y | Z
+name := <letter>[<letter> | <dig_with_0> | _]*
 ---------------------------------------------------------------------------
 reg := ACC | IN1 | IN2 | PC | SP | BAF | CS | DS
 arg := <reg> | <num>
