@@ -1,10 +1,10 @@
 # in:7
 # expected:42
-call input;
+call input acc;
 divi acc 2;
 multi acc 2097152;
 multi acc 1024;
 jump= 3;
 loadi acc 42;
-call print;
+call print acc;
 jump 0;

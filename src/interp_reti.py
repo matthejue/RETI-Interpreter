@@ -195,28 +195,28 @@ class RETIInterpreter:
                 reti.registers["PC"] = reti.sram[reti.registers["SP"] + 1]
                 # delete PC from stack
                 reti.registers["SP"] = reti.registers["SP"] + 1
-            case NT.Call(NT.Name("PRINT")):
+            case NT.Call(NT.Name("PRINT"), NT.Reg(reg)):
                 if global_vars.args.print_output:
                     if global_vars.args.print:
-                        print("\nOutput:\n\t" + str(reti.registers["ACC"]))
+                        print("\nOutput:\n\t" + str(reti.registers[reg]))
                     if global_vars.outbase:
                         if self.first_write_out:
                             with open(
                                 global_vars.outbase + ".out", "w", encoding="utf-8"
                             ) as fout:
-                                fout.write(str(reti.registers["ACC"]))
+                                fout.write(str(reti.registers[reg]))
                             self.first_write_out = False
                         else:
                             with open(
                                 global_vars.outbase + ".out", "a", encoding="utf-8"
                             ) as fout:
-                                fout.write(" " + str(reti.registers["ACC"]))
+                                fout.write(" " + str(reti.registers[reg]))
                 reti.registers["PC"] += 1
-            case NT.Call(NT.Name("INPUT")):
+            case NT.Call(NT.Name("INPUT"), NT.Reg(reg)):
                 if global_vars.test_input:
-                    reti.registers["ACC"] = global_vars.test_input.pop()
+                    reti.registers[reg] = global_vars.test_input.pop()
                 else:
-                    reti.registers["ACC"] = int(input())
+                    reti.registers[reg] = int(input())
                 reti.registers["PC"] += 1
 
     def _preconfigs(self, p, reti):

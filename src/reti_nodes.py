@@ -98,9 +98,9 @@ class NT:
     class Jump(ASTNode):
         def update_match_args(self):
             self.relation = self.children[0]
-            self.jumplength = self.children[1]
+            self.offset = self.children[1]
 
-        __match_args__ = ("relation", "jumplength")
+        __match_args__ = ("relation", "offset")
 
         def __repr__(self):
             return self.to_string_show_node()
@@ -144,8 +144,9 @@ class NT:
     class Call(ASTNode):
         def update_match_args(self):
             self.functionname = self.children[0]
+            self.reg = self.children[1]
 
-        __match_args__ = ("functionname",)
+        __match_args__ = ("functionname", "reg")
 
         def __repr__(self):
             return self.to_string_show_node()

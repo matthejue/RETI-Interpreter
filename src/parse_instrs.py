@@ -176,6 +176,8 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.NAME], classname=NT.Name)
 
+            self.add_and_match([TT.REG], classname=NT.Reg)
+
             self.ast_builder.up(savestate_node)
         else:
             # error

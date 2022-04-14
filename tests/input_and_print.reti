@@ -2,9 +2,8 @@
 # expected:42
 
 # let's a go
-call input;
-move acc in1;
-call input;  # inline comment
+call input acc;
+call input in1;  # inline comment
 add acc in1;
-call print;
+call print acc;
 jump 0;
