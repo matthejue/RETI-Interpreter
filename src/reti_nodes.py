@@ -1,7 +1,9 @@
 from ast_node import ASTNode
 
 
-class NT:
+class N:
+    """Nodes"""
+
     class Program(ASTNode):
         def update_match_args(self):
             self.programname = self.children[0]

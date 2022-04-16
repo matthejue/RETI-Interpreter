@@ -1,4 +1,4 @@
-from reti_nodes import NT
+from reti_nodes import N
 from reti import RETI
 import global_vars
 import os
@@ -20,29 +20,29 @@ class RETIInterpreter:
 
     def _op(self, operand1, operation, operand2):
         match operation:
-            case (NT.Add() | NT.Addi()):
+            case (N.Add() | N.Addi()):
                 # sigextension
                 return (operand1 + operand2) % 2**32
-            case (NT.Sub() | NT.Subi()):
+            case (N.Sub() | N.Subi()):
                 return (operand1 - operand2) % 2**32
-            case (NT.Mult() | NT.Multi()):
+            case (N.Mult() | N.Multi()):
                 return (operand1 * operand2) % 2**32
-            case (NT.Div() | NT.Divi()):
+            case (N.Div() | N.Divi()):
                 return (operand1 // operand2) % 2**32
-            case (NT.Mod() | NT.Modi()):
+            case (N.Mod() | N.Modi()):
                 return (operand1 % operand2) % 2**32
-            case (NT.Oplus() | NT.Oplusi()):
+            case (N.Oplus() | N.Oplusi()):
                 # signextension mit 0en
                 return (operand1 ^ operand2) % 2**32
-            case (NT.Or() | NT.Ori()):
+            case (N.Or() | N.Ori()):
                 return (operand1 | operand2) % 2**32
-            case (NT.And() | NT.Andi()):
+            case (N.And() | N.Andi()):
                 return (operand1 & operand2) % 2**32
 
     def _memory_store(self, destination, source, reti) -> int:
         match destination:
             # addressbus
-            case NT.Num(val):
+            case N.Num(val):
                 higher_bits = (reti.registers["DS"] >> 22) % 0b100000000 << 22
                 memory_type = reti.registers["DS"] >> 30
                 match memory_type:
@@ -52,7 +52,7 @@ class RETIInterpreter:
                         reti.uart[abs(int(val)) + higher_bits] = source
                     case _:
                         reti.sram[abs(int(val)) + higher_bits] = source
-            case NT.Reg(reg):
+            case N.Reg(reg):
                 reti.registers[reg] = source
             # right_databus
             case int():
@@ -69,7 +69,7 @@ class RETIInterpreter:
     def _memory_load(self, source, reti) -> int:
         match source:
             # addressbus
-            case NT.Num(val):
+            case N.Num(val):
                 higher_bits = (reti.registers["DS"] >> 22) % 0b100000000 << 22
                 memory_type = reti.registers["DS"] >> 30
                 match memory_type:
@@ -79,7 +79,7 @@ class RETIInterpreter:
                         return reti.uart[abs(int(val)) + higher_bits]
                     case _:
                         return reti.sram[abs(int(val)) + higher_bits]
-            case NT.Reg(reg):
+            case N.Reg(reg):
                 return reti.registers[reg]
             # right databus
             case int():
@@ -97,10 +97,10 @@ class RETIInterpreter:
 
     def _instr(self, instr, reti):
         match instr:
-            case NT.Instr(
+            case N.Instr(
                 operation,
-                NT.Reg() as destination,
-                (NT.Num() | NT.Reg()) as source,
+                N.Reg() as destination,
+                (N.Num() | N.Reg()) as source,
             ) if type(operation) in COMPUTE_INSTRUCTION.values():
                 self._memory_store(
                     destination,
@@ -112,7 +112,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(operation, NT.Reg() as destination, NT.Num(val)) if type(
+            case N.Instr(operation, N.Reg() as destination, N.Num(val)) if type(
                 operation
             ) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
                 # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
@@ -122,14 +122,14 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Load(), NT.Reg() as destination, NT.Num() as source):
+            case N.Instr(N.Load(), N.Reg() as destination, N.Num() as source):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
-            case NT.Instr(
-                NT.Loadin(),
-                NT.Reg() as reg_source,
-                NT.Reg() as destination,
-                NT.Num(val),
+            case N.Instr(
+                N.Loadin(),
+                N.Reg() as reg_source,
+                N.Reg() as destination,
+                N.Num(val),
             ):
                 self._memory_store(
                     destination,
@@ -140,7 +140,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Loadi(), NT.Reg() as destination, NT.Num(val)):
+            case N.Instr(N.Loadi(), N.Reg() as destination, N.Num(val)):
                 # TODO: Signextension?
                 self._memory_store(
                     destination,
@@ -148,14 +148,14 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Store(), NT.Reg() as source, NT.Num() as destination):
+            case N.Instr(N.Store(), N.Reg() as source, N.Num() as destination):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
-            case NT.Instr(
-                NT.Storein(),
-                NT.Reg() as destination,
-                NT.Reg() as reg_source,
-                NT.Num(val),
+            case N.Instr(
+                N.Storein(),
+                N.Reg() as destination,
+                N.Reg() as reg_source,
+                N.Num(val),
             ):
                 self._memory_store(
                     (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
@@ -163,39 +163,39 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case NT.Instr(NT.Move(), NT.Reg() as source, NT.Reg() as destination):
+            case N.Instr(N.Move(), N.Reg() as source, N.Reg() as destination):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
-            case NT.Jump(relation, NT.Num(val)):
+            case N.Jump(relation, N.Num(val)):
                 match relation:
-                    case NT.Lt():
+                    case N.Lt():
                         self._jump_condition(0 < reti.registers["ACC"], int(val), reti)
-                    case NT.LtE():
+                    case N.LtE():
                         self._jump_condition(0 <= reti.registers["ACC"], int(val), reti)
-                    case NT.Gt():
+                    case N.Gt():
                         self._jump_condition(0 > reti.registers["ACC"], int(val), reti)
-                    case NT.GtE():
+                    case N.GtE():
                         self._jump_condition(0 >= reti.registers["ACC"], int(val), reti)
-                    case (NT.Eq()):
+                    case (N.Eq()):
                         self._jump_condition(0 == reti.registers["ACC"], int(val), reti)
-                    case (NT.NEq()):
+                    case (N.NEq()):
                         self._jump_condition(0 != reti.registers["ACC"], int(val), reti)
-                    case (NT.Always()):
+                    case (N.Always()):
                         self._jump_condition(True, int(val), reti)
-                    case (NT.NOp()):
+                    case (N.NOp()):
                         self._jump_condition(False, int(val), reti)
-            case NT.Int(NT.Num(val)):
+            case N.Int(N.Num(val)):
                 # save PC to stack
                 reti.sram[reti.registers["SP"]] = reti.registers["PC"]
                 reti.registers["SP"] = reti.registers["SP"] - 1
                 # jump to start address of isr
                 reti.registers["PC"] = reti.sram[abs(int(val))]
-            case NT.Rti():
+            case N.Rti():
                 # restore PC
                 reti.registers["PC"] = reti.sram[reti.registers["SP"] + 1]
                 # delete PC from stack
                 reti.registers["SP"] = reti.registers["SP"] + 1
-            case NT.Call(NT.Name("PRINT"), NT.Reg(reg)):
+            case N.Call(N.Name("PRINT"), N.Reg(reg)):
                 if global_vars.args.print_output:
                     if global_vars.args.print:
                         print("\nOutput:\n\t" + str(reti.registers[reg]))
@@ -212,7 +212,7 @@ class RETIInterpreter:
                             ) as fout:
                                 fout.write(" " + str(reti.registers[reg]))
                 reti.registers["PC"] += 1
-            case NT.Call(NT.Name("INPUT"), NT.Reg(reg)):
+            case N.Call(N.Name("INPUT"), N.Reg(reg)):
                 if global_vars.test_input:
                     reti.registers[reg] = global_vars.test_input.pop()
                 else:
@@ -266,9 +266,9 @@ class RETIInterpreter:
                 ) as fout:
                     fout.write("\n\n" + str(reti_state))
 
-    def _instrs(self, p: NT.Program, reti):
+    def _instrs(self, p: N.Program, reti):
         match p:
-            case NT.Program(_, instructions):
+            case N.Program(_, instructions):
                 while True:
                     i = reti.registers["PC"] - global_vars.args.process_begin - 2**31
                     next_instruction = (
@@ -278,7 +278,7 @@ class RETIInterpreter:
                         break
                         # raise Errors.JumpedOutOfProgrammError()
                     match next_instruction:
-                        case NT.Jump(NT.Always(), NT.Num("0")):
+                        case N.Jump(N.Always(), N.Num("0")):
                             if (
                                 global_vars.args.reti_state
                                 and not global_vars.args.verbose
@@ -296,7 +296,7 @@ class RETIInterpreter:
                     if global_vars.args.reti_state and global_vars.args.verbose:
                         self._reti_state_option(reti)
 
-    def interp_reti(self, p: NT.Program):
+    def interp_reti(self, p: N.Program):
         # necessary for the __match_case__ of the nodes to work
         p.update_match_args()
         reti = RETI(p.instructions)

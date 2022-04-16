@@ -1,4 +1,4 @@
-from reti_nodes import NT
+from reti_nodes import N
 from lexer import TT
 from errors import Errors
 from parser import LL_Recursive_Decent_Parser
@@ -6,37 +6,37 @@ from itertools import chain
 
 
 COMPUTE_INSTRUCTION = {
-    TT.ADD: NT.Add,
-    TT.SUB: NT.Sub,
-    TT.MULT: NT.Mult,
-    TT.DIV: NT.Div,
-    TT.MOD: NT.Mod,
-    TT.OPLUS: NT.Oplus,
-    TT.OR: NT.Or,
-    TT.AND: NT.And,
+    TT.ADD: N.Add,
+    TT.SUB: N.Sub,
+    TT.MULT: N.Mult,
+    TT.DIV: N.Div,
+    TT.MOD: N.Mod,
+    TT.OPLUS: N.Oplus,
+    TT.OR: N.Or,
+    TT.AND: N.And,
 }
 
 COMPUTE_IMMEDIATE_INSTRUCTION = {
-    TT.ADDI: NT.Addi,
-    TT.SUBI: NT.Subi,
-    TT.MULTI: NT.Multi,
-    TT.DIVI: NT.Divi,
-    TT.MODI: NT.Modi,
-    TT.OPLUSI: NT.Oplusi,
-    TT.ORI: NT.Ori,
-    TT.ANDI: NT.Andi,
+    TT.ADDI: N.Addi,
+    TT.SUBI: N.Subi,
+    TT.MULTI: N.Multi,
+    TT.DIVI: N.Divi,
+    TT.MODI: N.Modi,
+    TT.OPLUSI: N.Oplusi,
+    TT.ORI: N.Ori,
+    TT.ANDI: N.Andi,
 }
 
 RELATION = {
-    TT.LT: NT.Lt,
-    TT.LTE: NT.LtE,
-    TT.GT: NT.Gt,
-    TT.GTE: NT.GtE,
-    TT.EQ: NT.Eq,
-    TT.EQ2: NT.Eq,
-    TT.NEQ: NT.NEq,
-    TT.NEQ2: NT.NEq,
-    TT.NOP: NT.NOp,
+    TT.LT: N.Lt,
+    TT.LTE: N.LtE,
+    TT.GT: N.Gt,
+    TT.GTE: N.GtE,
+    TT.EQ: N.Eq,
+    TT.EQ2: N.Eq,
+    TT.NEQ: N.NEq,
+    TT.NEQ2: N.NEq,
+    TT.NOP: N.NOp,
 }
 
 OTHER_INSTRUCTION = {
@@ -58,125 +58,125 @@ class InstrsParser(LL_Recursive_Decent_Parser):
         """instruction"""
         if self.LTT(1) in COMPUTE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_INSTRUCTION> <REGISTER> (<REGISTER>|<Immediate>)
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
             self.add_and_consume(mapping=COMPUTE_INSTRUCTION)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
             if self.LTT(1) == TT.REG:
-                self.add_and_consume(classname=NT.Reg)
+                self.add_and_consume(classname=N.Reg)
             elif self.LTT(1) == TT.IMMEDIATE:
-                self.add_and_consume(classname=NT.Num)
+                self.add_and_consume(classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) in COMPUTE_IMMEDIATE_INSTRUCTION.keys():
             # concrete_syntax: <COMPUTE_IMMEDIATE_INSTRUCTION> <REGISTER> <Immediate>
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
             self.add_and_consume(mapping=COMPUTE_IMMEDIATE_INSTRUCTION)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOAD:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Load)
+            self.add_and_consume(classname=N.Load)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADIN:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Loadin)
+            self.add_and_consume(classname=N.Loadin)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.LOADI:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Loadi)
+            self.add_and_consume(classname=N.Loadi)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STORE:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Store)
+            self.add_and_consume(classname=N.Store)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.STOREIN:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Storein)
+            self.add_and_consume(classname=N.Storein)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.MOVE:
-            savestate_node = self.ast_builder.down(NT.Instr)
+            savestate_node = self.ast_builder.down(N.Instr)
 
-            self.add_and_consume(classname=NT.Move)
+            self.add_and_consume(classname=N.Move)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.JUMP:
-            savestate_node = self.ast_builder.down(NT.Jump)
+            savestate_node = self.ast_builder.down(N.Jump)
 
             self.consume_next_token()
 
             if self.LTT(1) in RELATION.keys():
                 self.add_and_consume(mapping=RELATION)
             else:
-                savestate_node = self.ast_builder.down(NT.Always)
+                savestate_node = self.ast_builder.down(N.Always)
                 self.ast_builder.up(savestate_node)
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.INT:
-            savestate_node = self.ast_builder.down(NT.Int)
+            savestate_node = self.ast_builder.down(N.Int)
 
             self.consume_next_token()
 
-            self.add_and_match([TT.IMMEDIATE], classname=NT.Num)
+            self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.RTI:
-            self.add_and_consume(classname=NT.Rti)
+            self.add_and_consume(classname=N.Rti)
         elif self.LTT(1) == TT.CALL:
-            savestate_node = self.ast_builder.down(NT.Call)
+            savestate_node = self.ast_builder.down(N.Call)
 
             self.consume_next_token()
 
-            self.add_and_match([TT.NAME], classname=NT.Name)
+            self.add_and_match([TT.NAME], classname=N.Name)
 
-            self.add_and_match([TT.REG], classname=NT.Reg)
+            self.add_and_match([TT.REG], classname=N.Reg)
 
             self.ast_builder.up(savestate_node)
         else:
@@ -184,9 +184,9 @@ class InstrsParser(LL_Recursive_Decent_Parser):
             pass
 
     def _instrs(self):
-        savestate_node = self.ast_builder.down(NT.Program)
+        savestate_node = self.ast_builder.down(N.Program)
 
-        self.add_and_match([TT.NAME], classname=NT.Name)
+        self.add_and_match([TT.NAME], classname=N.Name)
 
         while self.LTT(1) in chain(
             COMPUTE_INSTRUCTION.keys(),
