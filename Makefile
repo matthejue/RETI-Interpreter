@@ -23,7 +23,7 @@ _shell:
 	./src/main.py
 
 extract:
-	./extract_input_and_except.sh
+	./extract_input_and_expected.sh
 
 test: _test clean
 test-clean-all: _test clean clean-files
