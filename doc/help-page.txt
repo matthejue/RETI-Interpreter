@@ -1,0 +1,187 @@
+
+===============================================================================
+=                                  `Synopsis`                                 =
+===============================================================================
+
+Usage: reti_interpreter / interpret [-h] [-c] [-t] [-a] [-o] [-r][-p] [-b
+PROCESS_BEGIN] [-d DATA_SEGMENT_SIZE] [-D DISTANCE] [-S SIGHT] [-C] [-v] [-g]
+[-m] [infile]
+
+Interprets RETI Code.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                            `Positional arguments`                           ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+infile                input file with PicoC Code. In the shell this is
+interpreted as string with PicoC Code
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `Optional arguments`                            ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-h, --help            show this help message and exit. With the -C option it
+can be colorized.
+-c, --concrete_syntax
+>                     also print the concrete syntax (content of input file).
+Only works if --print option is active
+-t, --tokens          also write the tokenlist
+-a, --abstract_syntax
+>                     also write the abstract syntax
+-o, --print-output
+>                     also write the output from the print call
+-r, --reti-state
+>                     also write the state of the reti registers and memories
+for every instruction
+-p, --print           print all file outputs to the terminal. Is always
+activated in the shell. Doesn't have to be activated manually in the shell.
+-b, --process_begin PROCESS_BEGIN
+>                     where the process starts in memory (default memory cell
+`8`)
+-d, --datasegment_size DATASEGMENT_SIZE
+>                     default size for the datasegment (default size `32`)
+-D, --distance DISTANCE
+>                     distance of the comments from the instructions for the
+--verbose option. The passed value gets added to the minimum distance of 2
+spaces
+-S, --sight SIGHT     sets the number of lines visible around a error message
+-C, --color           colorizes the terminal output. Gets ignored in the shell.
+Instead in the shell colors can be toggled via the `color_toggle` command
+(shortcut `ct`)
+-v, --verbose         also show tokentype and position for tokens, write the
+nodetype in front of parenthesis in the abstract syntax tree, add comments to
+the RETI Code
+-g, --debug           starts the debugger in the code
+-m, --show_error_message
+>                     show error message from python
+
+===============================================================================
+=                               `RETI Assembler`                              =
+===============================================================================
+
+RETI Assembler is a minimalistic Asssembler language.
+
+===============================================================================
+=                                   `Shell`                                   =
+===============================================================================
+
+If called without arguments, a shell is going to open.
+
+In the shell the cursor can be moved with the <left> and <right> arrow key.
+Previous and next commands can be retrieved with the <up> and <down> arrow key.
+A command can be completed with <tab>.
+
+In the shell "commands" like `interpret`, `most_used`, `color_toggle`,
+`history` etc. can be executed.
+
+The shell can be exited again by typing `quit`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `interpret command`                             ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+RETI Code can be executed with the `interpret <cli options> "<code>";` command
+(shortcut `itp`).
+The cli options are the same as for calling the interpreter from outside,
+except for the `infile` argument which is interpreted as string with RETI Code
+and which will get a 'JUMP 0' automatically added at the end of the RETI
+instructions.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `most_used command`                             ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you don't want to type the most likely used cli options out every time, you
+can use the `most_used "<code>";` command (shortcut `mu`).
+It's a shortcut for:
+
+`interpret -ctaor -p -v -b 8 -d 0 -D 20 -S 2 -m "<code>";`
+
+and shrinks it down to:
+
+`most_used "<code>";`
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                              `history command`                              ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To geht an overview over all previously executed commands, use the `history`
+command without any arguments.
+
+If you want to select one of the previously executed commands, this can be done
+by going back and forth in history with <up> and <down> or be searching the
+command with ctrl+r by providing a substring of the desired command.
+
+If you want to execute one of the commands in the history again, this can
+either done by "selecting" it and executing the choosen command or by looking
+up the <index> of the command with `history` and executing `history -r
+<index>`.
+
+If you want to change something about a command that was already executed, you
+can do that by "selecting" it and changing the choosen command or by looking up
+the <index> of the command with `history` and executing `history -e <index>`.
+This will open the choosen command in the default Editor (which is definid with
+the $EDITOR variable under Unix systems) where the command can be edited. When
+saving and quiting out of the editor the edited command will be executed.
+
+The history will get saved to the file `~/.config/pico_c_compiler/history.json`
+if this file exists under this path.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                            `color_toggle command`                           ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to have colorized output, this options can be toggled with the
+`color_toggle` command (shortcut `ct`).
+
+The truth value of this option will be saved between sessions if the file
+`~/.config/pico_c_compiler/settings.conf` with the option `color_on:
+<truth_value>` exists.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                                `help command`                               ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to see the help page from within the shell, enter `help` (shortcut
+`?`). The help page is the same as the one that can be viewed with the -h
+option.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                             `Multiline Command`                             ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Multiline commands can be written over multiple lines by hitting <enter> and
+terminating it with a `;` at the end.
+The `compile` and `most_used` command are multiline commands and thus always
+have to end with a `;`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                          `Redirect output to file`                          ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to copy the shell output to a file, enter `command > <filepath>`.
+If you want to append something to a file, enter `command >> <filepath>`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                          `Copy output to clipboard`                         ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to copy the shell output to your clipboard, enter `command >`.
+If you want to append something to your current clipboard copy, enter `command
+>>`.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~                `Execute OS level commands and pipe operator`                ~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want to execute a OS level command, use the `!` operator, e.g. `!ls`.
+If you want to pipe the shell output to a OS level command, use the pipe
+operator `|`, e.g. `help | wc`.
+
+===============================================================================
+=                                    `Misc`                                   =
+===============================================================================
+
+If you discover any bugs I would be very grateful if you could report it via
+email to `juergmatth@gmail.com`, attaching the malicious code to the email. ^_^
+

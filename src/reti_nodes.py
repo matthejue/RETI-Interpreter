@@ -4,6 +4,9 @@ from ast_node import ASTNode
 class N:
     """Nodes"""
 
+    # -------------------------------------------------------------------------
+    # -                            Container Nodes                            -
+    # -------------------------------------------------------------------------
     class Program(ASTNode):
         def update_match_args(self):
             self.programname = self.children[0]
@@ -31,72 +34,7 @@ class N:
             "argument3",
         )
 
-    class Add(ASTNode):
-        pass
-
-    class Addi(ASTNode):
-        pass
-
-    class Sub(ASTNode):
-        pass
-
-    class Subi(ASTNode):
-        pass
-
-    class Mult(ASTNode):
-        pass
-
-    class Multi(ASTNode):
-        pass
-
-    class Div(ASTNode):
-        pass
-
-    class Divi(ASTNode):
-        pass
-
-    class Mod(ASTNode):
-        pass
-
-    class Modi(ASTNode):
-        pass
-
-    class Oplus(ASTNode):
-        pass
-
-    class Oplusi(ASTNode):
-        pass
-
-    class Or(ASTNode):
-        pass
-
-    class Ori(ASTNode):
-        pass
-
-    class And(ASTNode):
-        pass
-
-    class Andi(ASTNode):
-        pass
-
-    class Load(ASTNode):
-        pass
-
-    class Loadin(ASTNode):
-        pass
-
-    class Loadi(ASTNode):
-        pass
-
-    class Store(ASTNode):
-        pass
-
-    class Storein(ASTNode):
-        pass
-
-    class Move(ASTNode):
-        pass
-
+    # --------------------------- Jump Instructions ---------------------------
     class Jump(ASTNode):
         def update_match_args(self):
             self.relation = self.children[0]
@@ -107,6 +45,126 @@ class N:
         def __repr__(self):
             return self.to_string_show_node()
 
+    class Int(ASTNode):
+        def update_match_args(self):
+            self.isr = self.children[0]
+
+        __match_args__ = ("isr",)
+
+        def __repr__(self):
+            return self.to_string_show_node()
+
+    # ---------------------------- Input and Print ----------------------------
+    class Call(ASTNode):
+        def update_match_args(self):
+            self.functionname = self.children[0]
+            self.reg = self.children[1]
+
+        __match_args__ = ("functionname", "reg")
+
+        def __repr__(self):
+            return self.to_string_show_node()
+
+    # -------------------------------- L_Block --------------------------------
+    class Block(ASTNode):
+        def __init__(self, blockname, stmsts):
+            self.blockname = blockname
+            self.stmts = stmsts
+
+        __match_args__ = ("blockname", "stmts")
+
+    class Goto(ASTNode):
+        def __init__(self, labelname):
+            self.labelname = labelname
+
+        __match_args__ = ("blockname",)
+
+    # -------------------------------------------------------------------------
+    # -                              Token Nodes                              -
+    # -------------------------------------------------------------------------
+    # ------------------------- Location and Immediate ------------------------
+    class Name(ASTNode):
+        # shorter then 'Identifier'
+        pass
+
+    class Reg(ASTNode):
+        pass
+
+    class Num(ASTNode):
+        # shorter then 'Immediate'
+        pass
+
+    # ----------------------- Compute Memory / Register -----------------------
+    class Add(ASTNode):
+        pass
+
+    class Sub(ASTNode):
+        pass
+
+    class Mult(ASTNode):
+        pass
+
+    class Div(ASTNode):
+        pass
+
+    class Mod(ASTNode):
+        pass
+
+    class Oplus(ASTNode):
+        pass
+
+    class Or(ASTNode):
+        pass
+
+    class And(ASTNode):
+        pass
+
+    # --------------------- Compute Immediate Instructions --------------------
+    class Addi(ASTNode):
+        pass
+
+    class Subi(ASTNode):
+        pass
+
+    class Multi(ASTNode):
+        pass
+
+    class Divi(ASTNode):
+        pass
+
+    class Modi(ASTNode):
+        pass
+
+    class Oplusi(ASTNode):
+        pass
+
+    class Ori(ASTNode):
+        pass
+
+    class Andi(ASTNode):
+        pass
+
+    # --------------------------- Load Instructions ---------------------------
+    class Load(ASTNode):
+        pass
+
+    class Loadin(ASTNode):
+        pass
+
+    class Loadi(ASTNode):
+        pass
+
+    # --------------------------- Store Instructions --------------------------
+    class Store(ASTNode):
+        pass
+
+    class Storein(ASTNode):
+        pass
+
+    class Move(ASTNode):
+        pass
+
+    # ------------------------------- Relations -------------------------------
     class Lt(ASTNode):
         pass
 
@@ -131,35 +189,6 @@ class N:
     class NOp(ASTNode):
         pass
 
-    class Int(ASTNode):
-        def update_match_args(self):
-            self.isr = self.children[0]
-
-        __match_args__ = ("isr",)
-
-        def __repr__(self):
-            return self.to_string_show_node()
-
+    # --------------------------- Jump Instructions ---------------------------
     class Rti(ASTNode):
-        pass
-
-    class Call(ASTNode):
-        def update_match_args(self):
-            self.functionname = self.children[0]
-            self.reg = self.children[1]
-
-        __match_args__ = ("functionname", "reg")
-
-        def __repr__(self):
-            return self.to_string_show_node()
-
-    class Name(ASTNode):
-        # shorter then 'Identifier'
-        pass
-
-    class Reg(ASTNode):
-        pass
-
-    class Num(ASTNode):
-        # shorter then 'Immediate'
         pass
