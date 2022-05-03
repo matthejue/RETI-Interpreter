@@ -7,6 +7,7 @@ class N:
     # -------------------------------------------------------------------------
     # -                            Container Nodes                            -
     # -------------------------------------------------------------------------
+    # -------------------------------- Program --------------------------------
     class Program(ASTNode):
         def update_match_args(self):
             self.programname = self.children[0]
@@ -19,6 +20,7 @@ class N:
             "instructions",
         )
 
+    # ------------------------- Load / Store / Compute ------------------------
     class Instr(ASTNode):
         def update_match_args(self):
             self.instruction = self.children[0]
@@ -57,10 +59,10 @@ class N:
     # ---------------------------- Input and Print ----------------------------
     class Call(ASTNode):
         def update_match_args(self):
-            self.functionname = self.children[0]
+            self.procedurename = self.children[0]
             self.reg = self.children[1]
 
-        __match_args__ = ("functionname", "reg")
+        __match_args__ = ("procedurename", "reg")
 
         def __repr__(self):
             return self.to_string_show_node()
