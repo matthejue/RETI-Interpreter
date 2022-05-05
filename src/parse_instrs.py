@@ -39,6 +39,16 @@ RELATION = {
     TT.NOP: N.NOp,
 }
 
+REGISTER = {
+    TT.ACC: N.Acc,
+    TT.IN1: N.In1,
+    TT.IN2: N.In2,
+    TT.SP: N.Sp,
+    TT.BAF: N.Baf,
+    TT.CS: N.Cs,
+    TT.DS: N.Ds,
+}
+
 OTHER_INSTRUCTION = {
     TT.LOAD,
     TT.LOADIN,
@@ -54,6 +64,20 @@ OTHER_INSTRUCTION = {
 
 
 class InstrsParser(LL_Recursive_Decent_Parser):
+    def _reg_match(self):
+        savestate_node = self.ast_builder.down(N.Reg)
+
+        self.add_and_match(list(REGISTER.keys()), mapping=REGISTER)
+
+        self.ast_builder.up(savestate_node)
+
+    def _reg_consume(self):
+        savestate_node = self.ast_builder.down(N.Reg)
+
+        self.add_and_match(list(REGISTER.keys()), mapping=REGISTER)
+
+        self.ast_builder.up(savestate_node)
+
     def _instr(self):
         """instruction"""
         if self.LTT(1) in COMPUTE_INSTRUCTION.keys():
@@ -62,10 +86,10 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(mapping=COMPUTE_INSTRUCTION)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
-            if self.LTT(1) == TT.REG:
-                self.add_and_consume(classname=N.Reg)
+            if self.LTT(1) in REGISTER.keys():
+                self._reg_consume()
             elif self.LTT(1) == TT.IMMEDIATE:
                 self.add_and_consume(classname=N.Num)
 
@@ -76,7 +100,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(mapping=COMPUTE_IMMEDIATE_INSTRUCTION)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -86,7 +110,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Load)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -96,9 +120,9 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Loadin)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -108,7 +132,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Loadi)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -118,7 +142,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Store)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -128,9 +152,9 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Storein)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.add_and_match([TT.IMMEDIATE], classname=N.Num)
 
@@ -140,9 +164,9 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_consume(classname=N.Move)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.ast_builder.up(savestate_node)
         elif self.LTT(1) == TT.JUMP:
@@ -176,7 +200,7 @@ class InstrsParser(LL_Recursive_Decent_Parser):
 
             self.add_and_match([TT.NAME], classname=N.Name)
 
-            self.add_and_match([TT.REG], classname=N.Reg)
+            self._reg_match()
 
             self.ast_builder.up(savestate_node)
         else:

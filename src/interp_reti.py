@@ -53,7 +53,7 @@ class RETIInterpreter:
                     case _:
                         reti.sram[abs(int(val)) + higher_bits] = source
             case N.Reg(reg):
-                reti.registers[reg] = source
+                reti.registers[reg.value] = source
             # right_databus
             case int():
                 # TODO: signextension
@@ -80,7 +80,7 @@ class RETIInterpreter:
                     case _:
                         return reti.sram[abs(int(val)) + higher_bits]
             case N.Reg(reg):
-                return reti.registers[reg]
+                return reti.registers[reg.value]
             # right databus
             case int():
                 memory_type = source >> 30
@@ -198,25 +198,25 @@ class RETIInterpreter:
             case N.Call(N.Name("PRINT"), N.Reg(reg)):
                 if global_vars.args.print_output:
                     if global_vars.args.print:
-                        print("\nOutput:\n\t" + str(reti.registers[reg]))
+                        print("\nOutput:\n\t" + str(reti.registers[reg.value]))
                     if global_vars.outbase:
                         if self.first_write_out:
                             with open(
                                 global_vars.outbase + ".out", "w", encoding="utf-8"
                             ) as fout:
-                                fout.write(str(reti.registers[reg]))
+                                fout.write(str(reti.registers[reg.value]))
                             self.first_write_out = False
                         else:
                             with open(
                                 global_vars.outbase + ".out", "a", encoding="utf-8"
                             ) as fout:
-                                fout.write(" " + str(reti.registers[reg]))
+                                fout.write(" " + str(reti.registers[reg.value]))
                 reti.registers["PC"] += 1
             case N.Call(N.Name("INPUT"), N.Reg(reg)):
                 if global_vars.test_input:
-                    reti.registers[reg] = global_vars.test_input.pop()
+                    reti.registers[reg.value] = global_vars.test_input.pop()
                 else:
-                    reti.registers[reg] = int(input())
+                    reti.registers[reg.value] = int(input())
                 reti.registers["PC"] += 1
 
     def _preconfigs(self, p, reti):
@@ -228,7 +228,7 @@ class RETIInterpreter:
         )
         reti.registers["SP"] = (
             global_vars.args.process_begin
-            + len(p.instructions)
+            + len(p.instrs)
             + global_vars.args.datasegment_size
             + 2**31
             - 1
@@ -299,6 +299,6 @@ class RETIInterpreter:
     def interp_reti(self, p: N.Program):
         # necessary for the __match_case__ of the nodes to work
         p.update_match_args()
-        reti = RETI(p.instructions)
+        reti = RETI(p.instrs)
         self._preconfigs(p, reti)
         self._instrs(p, reti)

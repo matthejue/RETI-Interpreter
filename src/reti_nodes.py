@@ -11,61 +11,74 @@ class N:
     class Program(ASTNode):
         def update_match_args(self):
             self.programname = self.children[0]
-            self.instructions = self.children[1:]
-            for instr in self.instructions:
+            self.instrs = self.children[1:]
+            for instr in self.instrs:
                 instr.update_match_args()
 
         __match_args__ = (
             "programname",
-            "instructions",
+            "instrs",
         )
 
     # ------------------------- Load / Store / Compute ------------------------
     class Instr(ASTNode):
         def update_match_args(self):
-            self.instruction = self.children[0]
-            self.argument1 = self.children[1]
-            self.argument2 = self.children[2]
+            self.instr = self.children[0]
+            self.arg1 = self.children[1]
+            self.arg2 = self.children[2]
             if len(self.children) == 4:
-                self.argument3 = self.children[3]
+                self.arg3 = self.children[3]
+            self.arg1.update_match_args()
+            self.arg2.update_match_args()
 
         __match_args__ = (
-            "instruction",
-            "argument1",
-            "argument2",
-            "argument3",
+            "instr",
+            "arg1",
+            "arg2",
+            "arg3",
         )
 
     # --------------------------- Jump Instructions ---------------------------
     class Jump(ASTNode):
         def update_match_args(self):
-            self.relation = self.children[0]
+            self.rel = self.children[0]
             self.offset = self.children[1]
-
-        __match_args__ = ("relation", "offset")
 
         def __repr__(self):
             return self.to_string_show_node()
+
+        __match_args__ = ("rel", "offset")
 
     class Int(ASTNode):
         def update_match_args(self):
             self.isr = self.children[0]
 
-        __match_args__ = ("isr",)
-
         def __repr__(self):
             return self.to_string_show_node()
+
+        __match_args__ = ("isr",)
 
     # ---------------------------- Input and Print ----------------------------
     class Call(ASTNode):
         def update_match_args(self):
             self.procedurename = self.children[0]
             self.reg = self.children[1]
-
-        __match_args__ = ("procedurename", "reg")
+            self.reg.update_match_args()
 
         def __repr__(self):
             return self.to_string_show_node()
+
+        __match_args__ = ("procedurename", "reg")
+
+    # ------------------------- Location and Immediate ------------------------
+    class Reg(ASTNode):
+        def update_match_args(self):
+            self.reg = self.children[0]
+
+        def __repr__(self):
+            return self.to_string_show_node()
+
+        __match_args__ = ("reg",)
 
     # -------------------------------------------------------------------------
     # -                              Token Nodes                              -
@@ -73,9 +86,6 @@ class N:
     # ------------------------- Location and Immediate ------------------------
     class Name(ASTNode):
         # shorter then 'Identifier'
-        pass
-
-    class Reg(ASTNode):
         pass
 
     class Num(ASTNode):
@@ -179,4 +189,26 @@ class N:
 
     # --------------------------- Jump Instructions ---------------------------
     class Rti(ASTNode):
+        pass
+
+    # ------------------------------- Registers -------------------------------
+    class Acc(ASTNode):
+        pass
+
+    class In1(ASTNode):
+        pass
+
+    class In2(ASTNode):
+        pass
+
+    class Sp(ASTNode):
+        pass
+
+    class Baf(ASTNode):
+        pass
+
+    class Cs(ASTNode):
+        pass
+
+    class Ds(ASTNode):
         pass

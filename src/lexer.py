@@ -53,9 +53,8 @@ class TT(Enum):
     MOVE = "MOVE"
     JUMP = "JUMP"
     INT = "INT"
-    RTI = "RETI"
+    RTI = "RTI"
     CALL = "CALL"
-    REG = "register"
     IMMEDIATE = "immediate"
     NAME = "name"
     LT = "<"
@@ -68,6 +67,13 @@ class TT(Enum):
     NEQ2 = "<>"
     NOP = "_NOP"
     SEMICOLON = ";"
+    ACC = "ACC"
+    IN1 = "IN1"
+    IN2 = "IN2"
+    SP = "SP"
+    BAF = "BAF"
+    CS = "CS"
+    DS = "DS"
     EOF = "end of file"
 
 
@@ -93,7 +99,7 @@ STRING_TO_TT_RELATION = {
     )
 }
 
-REGISTER = [
+REGISTERS = (
     "ACC",
     "IN1",
     "IN2",
@@ -102,14 +108,24 @@ REGISTER = [
     "BAF",
     "CS",
     "DS",
-]
+)
+
+STRING_TO_TT_REGISTER = {
+    value.value: value
+    for value in (
+        value
+        for key, value in TT.__dict__.items()
+        if not key.startswith("_") and value.value in REGISTERS
+    )
+}
 
 STRING_TO_TT_INSTRUCTION = {
     value.value: value
     for value in (
         value
         for key, value in TT.__dict__.items()
-        if not key.startswith("_") and value.value not in NOT_TO_MAP + RELATIONS
+        if not key.startswith("_")
+        and value.value not in NOT_TO_MAP + RELATIONS + REGISTERS
     )
 }
 
@@ -178,8 +194,8 @@ class Lexer:
                 while self.lc in self.LETTER + self.DIGIT_WITH_ZERO + "_":
                     self.next_char()
                     word += self.c
-                if word in REGISTER:
-                    return Token(TT.REG, word, self.position)
+                if STRING_TO_TT_REGISTER.get(word):
+                    return Token(STRING_TO_TT_REGISTER[word], word, self.position)
                 elif STRING_TO_TT_INSTRUCTION.get(word):
                     return Token(STRING_TO_TT_INSTRUCTION[word], word, self.position)
                 else:
