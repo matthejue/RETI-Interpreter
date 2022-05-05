@@ -67,20 +67,6 @@ class N:
         def __repr__(self):
             return self.to_string_show_node()
 
-    # -------------------------------- L_Block --------------------------------
-    class Block(ASTNode):
-        def __init__(self, blockname, stmsts):
-            self.blockname = blockname
-            self.stmts = stmsts
-
-        __match_args__ = ("blockname", "stmts")
-
-    class Goto(ASTNode):
-        def __init__(self, labelname):
-            self.labelname = labelname
-
-        __match_args__ = ("blockname",)
-
     # -------------------------------------------------------------------------
     # -                              Token Nodes                              -
     # -------------------------------------------------------------------------
