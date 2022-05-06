@@ -24,19 +24,11 @@ class N:
     class Instr(ASTNode):
         def update_match_args(self):
             self.instr = self.children[0]
-            self.arg1 = self.children[1]
-            self.arg2 = self.children[2]
-            if len(self.children) == 4:
-                self.arg3 = self.children[3]
-            self.arg1.update_match_args()
-            self.arg2.update_match_args()
+            self.args = self.children[1:]
+            for arg in self.args[:2]:
+                arg.update_match_args()
 
-        __match_args__ = (
-            "instr",
-            "arg1",
-            "arg2",
-            "arg3",
-        )
+        __match_args__ = ("instr", "args")
 
     # --------------------------- Jump Instructions ---------------------------
     class Jump(ASTNode):

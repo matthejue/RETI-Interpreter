@@ -99,8 +99,7 @@ class RETIInterpreter:
         match instr:
             case N.Instr(
                 operation,
-                N.Reg() as destination,
-                (N.Num() | N.Reg()) as source,
+                [N.Reg() as destination, (N.Num() | N.Reg()) as source],
             ) if type(operation) in COMPUTE_INSTRUCTION.values():
                 self._memory_store(
                     destination,
@@ -112,7 +111,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case N.Instr(operation, N.Reg() as destination, N.Num(val)) if type(
+            case N.Instr(operation, [N.Reg() as destination, N.Num(val)]) if type(
                 operation
             ) in COMPUTE_IMMEDIATE_INSTRUCTION.values():
                 # TODO: Signextension? Bei Oplusi, Ori, Andi wird immer mit 0en signextendet
@@ -122,14 +121,12 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case N.Instr(N.Load(), N.Reg() as destination, N.Num() as source):
+            case N.Instr(N.Load(), [N.Reg() as destination, N.Num() as source]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case N.Instr(
                 N.Loadin(),
-                N.Reg() as reg_source,
-                N.Reg() as destination,
-                N.Num(val),
+                [N.Reg() as reg_source, N.Reg() as destination, N.Num(val)],
             ):
                 self._memory_store(
                     destination,
@@ -140,7 +137,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case N.Instr(N.Loadi(), N.Reg() as destination, N.Num(val)):
+            case N.Instr(N.Loadi(), [N.Reg() as destination, N.Num(val)]):
                 # TODO: Signextension?
                 self._memory_store(
                     destination,
@@ -148,14 +145,12 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case N.Instr(N.Store(), N.Reg() as source, N.Num() as destination):
+            case N.Instr(N.Store(), [N.Reg() as source, N.Num() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case N.Instr(
                 N.Storein(),
-                N.Reg() as destination,
-                N.Reg() as reg_source,
-                N.Num(val),
+                [N.Reg() as destination, N.Reg() as reg_source, N.Num(val)],
             ):
                 self._memory_store(
                     (abs(self._memory_load(destination, reti)) + int(val)) % 2**32,
@@ -163,7 +158,7 @@ class RETIInterpreter:
                     reti,
                 )
                 reti.registers["PC"] += 1
-            case N.Instr(N.Move(), N.Reg() as source, N.Reg() as destination):
+            case N.Instr(N.Move(), [N.Reg() as source, N.Reg() as destination]):
                 self._memory_store(destination, self._memory_load(source, reti), reti)
                 reti.registers["PC"] += 1
             case N.Jump(relation, N.Num(val)):
