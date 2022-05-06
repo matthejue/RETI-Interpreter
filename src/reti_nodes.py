@@ -62,7 +62,18 @@ class N:
 
         __match_args__ = ("procedurename", "reg")
 
-    # ------------------------- Location and Immediate ------------------------
+    # -------------------------------------------------------------------------
+    # -                              Token Nodes                              -
+    # -------------------------------------------------------------------------
+    # ------------------- Identifier, Immediate and Register ------------------
+    class Name(ASTNode):
+        # shorter then 'Identifier'
+        pass
+
+    class Num(ASTNode):
+        # shorter then 'Immediate'
+        pass
+
     class Reg(ASTNode):
         def update_match_args(self):
             self.reg = self.children[0]
@@ -71,18 +82,6 @@ class N:
             return self.to_string_show_node()
 
         __match_args__ = ("reg",)
-
-    # -------------------------------------------------------------------------
-    # -                              Token Nodes                              -
-    # -------------------------------------------------------------------------
-    # ------------------------- Location and Immediate ------------------------
-    class Name(ASTNode):
-        # shorter then 'Identifier'
-        pass
-
-    class Num(ASTNode):
-        # shorter then 'Immediate'
-        pass
 
     # ----------------------- Compute Memory / Register -----------------------
     class Add(ASTNode):
