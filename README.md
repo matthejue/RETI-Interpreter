@@ -17,6 +17,6 @@
     ·
     <a href="./doc/concrete_syntax.txt">Concrete Syntax</a>
     ·
-    <a href="https://github.com/matthejue/PicoC-Compiler/blob/new_architecture/doc/abstract_syntax.txt">Abstract Syntax</a>
+    <a href="https://github.com/matthejue/PicoC-Compiler/blob/new_architecture/doc/abstract_syntax.txt#L71">Abstract Syntax</a>
   </p>
 </div>
