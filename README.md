@@ -15,6 +15,8 @@
     <br />
     <a href="./doc/help-page.txt">Usage</a>
     ·
-    <a href="./doc/concrete_and_abstract_syntax.txt">Concrete and Abstract Syntax</a>
+    <a href="./doc/concrete_syntax.txt">Concrete Syntax</a>
+    ·
+    <a href="https://github.com/matthejue/PicoC-Compiler/blob/new_architecture/doc/abstract_syntax.txt">Abstract Syntax</a>
   </p>
 </div>
